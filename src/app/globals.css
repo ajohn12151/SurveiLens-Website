@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #050505;
+  --color-foreground: #ededed;
+
+  /* Surveilens Palette */
+  --color-surveilens-bg: #050505;
+  --color-surveilens-blue: #2B6AFF;
+  /* Electric Blue */
+  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-glass-bg: rgba(255, 255, 255, 0.03);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-roboto-mono);
+
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-slow-pulse: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-radar-ping: radar-ping 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-radar-ping-delayed: radar-ping 3s cubic-bezier(0, 0, 0.2, 1) infinite 1.5s;
+  --animate-radar-spin: radar-spin 12s linear infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes radar-ping {
+    0% {
+      transform: scale(0.8);
+      opacity: 0.6;
+    }
+
+    50% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+
+    100% {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+  }
+
+  @keyframes radar-spin {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  --animate-fade-in-up: fade-in-up 0.7s ease-out forwards;
+  --animate-shine: shine 3s infinite linear;
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes shine {
+    0% {
+      transform: translateX(-150%) skewX(-12deg);
+    }
+
+    50% {
+      transform: translateX(150%) skewX(-12deg);
+    }
+
+    100% {
+      transform: translateX(150%) skewX(-12deg);
+    }
+  }
+}
+
+/* Custom Utilities */
+@utility glass-panel {
+  @apply bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] backdrop-blur-md;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: hidden;
+}
