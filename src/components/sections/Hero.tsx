@@ -8,8 +8,8 @@ import { ChevronDown, Camera, BellRing, ShieldCheck } from "lucide-react";
 export const Hero = () => {
     return (
         <section className="relative flex min-h-[95vh] flex-col items-center justify-center pt-20 text-center">
-            {/* Background Radar Animation */}
-            <div className="absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1400px] h-[1400px] pointer-events-none opacity-30">
+            {/* Background Radar Animation (Desktop Only) */}
+            <div className="hidden sm:block absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 sm:w-[1400px] sm:h-[1400px] pointer-events-none opacity-30">
                 {/* Multiple pulsing rings */}
                 <div className="absolute inset-0 border-4 border-surveilens-blue/50 rounded-full animate-radar-ping" />
                 <div className="absolute inset-[100px] border-2 border-surveilens-blue/40 rounded-full animate-radar-ping-delayed" />
@@ -27,7 +27,25 @@ export const Hero = () => {
             </div>
 
             {/* Enhanced Glow Effect */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-surveilens-blue/20 blur-[180px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[700px] sm:h-[700px] bg-surveilens-blue/20 blur-[80px] sm:blur-[180px] rounded-full pointer-events-none" />
+
+            {/* Mobile Digital Scope (Visible Tech Layer) */}
+            <div className="block sm:hidden absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] pointer-events-none opacity-50">
+                {/* Rotating Dashed Ring - The Core Scope */}
+                <div className="absolute inset-0 rounded-full border-2 border-dashed border-surveilens-blue/40 animate-[spin_30s_linear_infinite]">
+                    {/* Orbiting blip */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-surveilens-blue rounded-full shadow-[0_0_10px_rgba(43,106,255,0.8)]" />
+                </div>
+
+                {/* Static Inner Hairline Ring */}
+                <div className="absolute inset-8 rounded-full border border-surveilens-blue/20" />
+
+                {/* Static Crosshairs */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 w-[1px] h-8 bg-surveilens-blue/50" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 w-[1px] h-8 bg-surveilens-blue/50" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-[1px] w-8 bg-surveilens-blue/50" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-[1px] w-8 bg-surveilens-blue/50" />
+            </div>
 
             <div className="relative z-10 px-4 max-w-5xl mx-auto flex flex-col items-center gap-8">
                 {/* Market Position Pill */}
@@ -47,8 +65,8 @@ export const Hero = () => {
                     Surveilens overlays on existing camera systems to surface high-impact safety signals—without adding cameras or changing your stack.
                 </p>
 
-                {/* Proof Bullets */}
-                <div className="flex flex-wrap justify-center gap-6 text-sm text-zinc-500">
+                {/* Proof Bullets (Hidden on Mobile) */}
+                <div className="hidden sm:flex flex-wrap justify-center gap-6 text-sm text-zinc-500">
                     <div className="flex items-center gap-2">
                         <Camera className="w-4 h-4 text-surveilens-blue" />
                         <span>Works with existing camera/VMS feeds</span>

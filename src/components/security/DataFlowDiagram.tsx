@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { animate } from "animejs";
 import { cn } from "@/lib/utils";
 import { Shield, Lock, CheckCircle2 } from "lucide-react";
 
@@ -41,15 +40,82 @@ const STEPS: FlowStep[] = [
     },
 ];
 
+const DataFlowVisual = ({ state }: { state: "process" | "scan" | "secure" | "deliver" }) => {
+    return (
+        <div className="relative w-full h-[250px] sm:h-[400px] flex items-center justify-center bg-zinc-900/30 rounded-3xl border border-white/5 backdrop-blur-sm overflow-hidden mb-6 lg:mb-0">
+            {/* Central Animation Container */}
+            <div className="relative w-48 h-48 sm:w-64 sm:h-64 flex items-center justify-center">
+
+                {/* STATE 1: PROCESS (Spinning Rings) */}
+                <div className={cn(
+                    "absolute inset-0 flex items-center justify-center transition-all duration-700 transform",
+                    state === "process" ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                )}>
+                    <div className="absolute w-32 h-32 sm:w-48 sm:h-48 border-2 border-surveilens-blue/30 rounded-full border-t-surveilens-blue animate-spin" style={{ animationDuration: '3s' }} />
+                    <div className="absolute w-24 h-24 sm:w-32 sm:h-32 border-2 border-surveilens-blue/20 rounded-full border-b-surveilens-blue animate-spin" style={{ animationDuration: '5s', animationDirection: 'reverse' }} />
+                    <div className="absolute w-4 h-4 bg-surveilens-blue rounded-full blur-[10px] animate-pulse" />
+                    <span className="mt-48 sm:mt-64 text-xs font-mono text-surveilens-blue tracking-widest absolute">PROCESSING</span>
+                </div>
+
+                {/* STATE 2: SCAN (Red Core + Pulse) */}
+                <div className={cn(
+                    "absolute inset-0 flex items-center justify-center transition-all duration-700 transform",
+                    state === "scan" ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                )}>
+                    <div className="absolute w-20 h-20 border border-red-500/50 rounded-full animate-ping" style={{ animationDuration: '2s' }} />
+                    <div className="absolute w-20 h-20 border border-red-500/50 rounded-full animate-ping" style={{ animationDuration: '2s', animationDelay: '0.5s' }} />
+                    <div className="w-24 h-24 bg-red-500/10 rounded-full border border-red-500/50 flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.3)] animate-pulse">
+                        <div className="w-3 h-3 bg-red-500 rounded-full" />
+                    </div>
+                    <span className="mt-48 sm:mt-64 text-xs font-mono text-red-400 tracking-widest absolute">THREAT DETECTED</span>
+                </div>
+
+                {/* STATE 3: SECURE (Shield + Lock) */}
+                <div className={cn(
+                    "absolute inset-0 flex items-center justify-center transition-all duration-700 transform",
+                    state === "secure" ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                )}>
+                    <div className="relative">
+                        <Shield className="w-32 h-32 text-purple-500 fill-purple-500/10 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)] animate-pulse" strokeWidth={1} style={{ animationDuration: '3s' }} />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <Lock className="w-12 h-12 text-white drop-shadow-md" />
+                        </div>
+                    </div>
+                    <span className="mt-48 sm:mt-64 text-xs font-mono text-purple-400 tracking-widest absolute">ENCRYPTED</span>
+                </div>
+
+                {/* STATE 4: DELIVER (Flowing Data) */}
+                <div className={cn(
+                    "absolute inset-0 flex items-center justify-center transition-all duration-700 transform",
+                    state === "deliver" ? "opacity-100 scale-100" : "opacity-0 scale-75"
+                )}>
+                    <div className="flex flex-col items-center justify-center gap-4">
+                        <CheckCircle2 className="w-16 h-16 text-green-400 drop-shadow-[0_0_15px_rgba(74,222,128,0.4)]" />
+                        <div className="space-y-2 w-48">
+                            <div className="h-2 w-full bg-white/10 rounded overflow-hidden">
+                                <div className="h-full bg-green-400 w-full animate-pulse" />
+                            </div>
+                            <div className="h-2 w-2/3 bg-white/10 rounded" />
+                        </div>
+                    </div>
+                    <span className="mt-48 sm:mt-64 text-xs font-mono text-green-400 tracking-widest absolute">LOGGED & DELIVERED</span>
+                </div>
+
+            </div>
+        </div>
+    );
+}
+
 export const DataFlowDiagram = () => {
     const [activeStep, setActiveStep] = useState(0);
     const containerRef = useRef<HTMLDivElement>(null);
-    const diagramRef = useRef<HTMLDivElement>(null);
 
-    // Scroll Observer
+    // Scroll Observer (Desktop Only basically, but benign on mobile)
     useEffect(() => {
         const handleScroll = () => {
+            if (window.innerWidth < 1024) return; // Only track on desktop
             if (!containerRef.current) return;
+
             const steps = containerRef.current.querySelectorAll(".flow-step");
             const viewportCenter = window.innerHeight / 2;
 
@@ -62,144 +128,50 @@ export const DataFlowDiagram = () => {
         };
 
         window.addEventListener("scroll", handleScroll, { passive: true });
+        handleScroll(); // Initial check
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
-
-    // Animation Logic
-    useEffect(() => {
-        const state = STEPS[activeStep].state;
-
-        // Reset all states first
-        animate(".anim-state", {
-            opacity: 0,
-            scale: 0.8,
-            duration: 600,
-            easing: "easeOutQuad"
-        });
-
-        // Activate current state
-        animate(`#state-${state}`, {
-            opacity: 1,
-            scale: 1,
-            duration: 800,
-            easing: "easeOutElastic(1, .8)"
-        });
-
-        // Specific State Animations
-        if (state === "process") {
-            animate("#ring-outer", {
-                rotate: 360,
-                duration: 8000,
-                loop: true,
-                easing: "linear"
-            });
-            animate("#ring-inner", {
-                rotate: -360,
-                duration: 12000,
-                loop: true,
-                easing: "linear"
-            });
-        }
-
-        if (state === "scan") {
-            animate(".scan-pulse", {
-                scale: [1, 2],
-                opacity: [0.8, 0],
-                duration: 1500,
-                loop: true,
-                easing: "easeOutQuad",
-                delay: (el, i) => i * 400
-            });
-        }
-
-        if (state === "secure") {
-            animate("#shield-icon", {
-                strokeDashoffset: [0, 0], // Ensure visible
-                scale: [0.9, 1],
-                duration: 1000,
-                direction: 'alternate',
-                loop: true,
-                easing: "easeInOutSine"
-            });
-        }
-
-    }, [activeStep]);
 
     return (
         <section ref={containerRef} className="relative py-24 bg-black/50 border-y border-white/5">
             <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16">
 
-                {/* Sticky Animation Stage */}
-                <div className="lg:sticky lg:top-32 h-[400px] flex items-center justify-center bg-zinc-900/30 rounded-3xl border border-white/5 backdrop-blur-sm overflow-hidden" ref={diagramRef}>
-
-                    {/* Central Animation Container */}
-                    <div className="relative w-64 h-64 flex items-center justify-center">
-
-                        {/* STATE 1: PROCESS (Spinning Rings) */}
-                        <div id="state-process" className="anim-state absolute inset-0 flex items-center justify-center opacity-0">
-                            <div id="ring-outer" className="absolute w-48 h-48 border-2 border-surveilens-blue/30 rounded-full border-t-surveilens-blue" />
-                            <div id="ring-inner" className="absolute w-32 h-32 border-2 border-surveilens-blue/20 rounded-full border-b-surveilens-blue" />
-                            <div className="absolute w-4 h-4 bg-surveilens-blue rounded-full blur-[10px] animate-pulse" />
-                            <span className="mt-64 text-xs font-mono text-surveilens-blue tracking-widest absolute">PROCESSING</span>
-                        </div>
-
-                        {/* STATE 2: SCAN (Red Core + Pulse) */}
-                        <div id="state-scan" className="anim-state absolute inset-0 flex items-center justify-center opacity-0">
-                            <div className="scan-pulse absolute w-20 h-20 border border-red-500/50 rounded-full" />
-                            <div className="scan-pulse absolute w-20 h-20 border border-red-500/50 rounded-full" />
-                            <div className="w-24 h-24 bg-red-500/10 rounded-full border border-red-500/50 flex items-center justify-center shadow-[0_0_30px_rgba(239,68,68,0.3)]">
-                                <div className="w-3 h-3 bg-red-500 rounded-full" />
-                            </div>
-                            <span className="mt-64 text-xs font-mono text-red-400 tracking-widest absolute">THREAT DETECTED</span>
-                        </div>
-
-                        {/* STATE 3: SECURE (Shield + Lock) */}
-                        <div id="state-secure" className="anim-state absolute inset-0 flex items-center justify-center opacity-0">
-                            <Shield id="shield-icon" className="w-32 h-32 text-purple-500 fill-purple-500/10 drop-shadow-[0_0_15px_rgba(168,85,247,0.4)]" strokeWidth={1} />
-                            <Lock className="absolute w-12 h-12 text-white drop-shadow-md" />
-                            <span className="mt-64 text-xs font-mono text-purple-400 tracking-widest absolute">ENCRYPTED</span>
-                        </div>
-
-                        {/* STATE 4: DELIVER (Flowing Data) */}
-                        <div id="state-deliver" className="anim-state absolute inset-0 flex items-center justify-center opacity-0">
-                            <div className="flex flex-col items-center justify-center gap-4">
-                                <CheckCircle2 className="w-16 h-16 text-green-400" />
-                                <div className="space-y-2 w-48">
-                                    <div className="h-2 w-full bg-white/10 rounded overflow-hidden">
-                                        <div className="h-full bg-green-400 w-full animate-[shimmer_1s_infinite]" />
-                                    </div>
-                                    <div className="h-2 w-2/3 bg-white/10 rounded" />
-                                </div>
-                            </div>
-                            <span className="mt-64 text-xs font-mono text-green-400 tracking-widest absolute">LOGGED & DELIVERED</span>
-                        </div>
-
-                    </div>
-
+                {/* Sticky Animation Stage (Desktop Only) */}
+                <div className="hidden lg:block lg:sticky lg:top-32 h-fit">
+                    <DataFlowVisual state={STEPS[activeStep].state} />
                 </div>
 
                 {/* Steps Column */}
-                <div className="space-y-[40vh] py-[10vh]">
+                <div className="space-y-12 lg:space-y-[40vh] py-0 lg:py-[10vh]">
                     {STEPS.map((step, i) => (
                         <div
                             key={step.id}
                             className={cn(
-                                "flow-step p-8 rounded-2xl border transition-all duration-500",
+                                "flow-step transition-all duration-500",
+                                // Desktop styles for inactive steps
+                                "lg:p-8 lg:rounded-2xl lg:border",
                                 activeStep === i
-                                    ? "bg-white/5 border-white/20 opacity-100 scale-100"
-                                    : "bg-transparent border-transparent opacity-30 scale-95"
+                                    ? "lg:bg-white/5 lg:border-white/20 lg:opacity-100 lg:scale-100"
+                                    : "lg:bg-transparent lg:border-transparent lg:opacity-30 lg:scale-95"
                             )}
                         >
-                            <span className="text-xs font-mono text-surveilens-blue mb-2 block">STEP 0{i + 1}</span>
-                            <h3 className="text-2xl font-bold text-white mb-4">{step.title}</h3>
-                            <p className="text-zinc-400 leading-relaxed text-lg">{step.description}</p>
+                            {/* Mobile Visual (Embedded) */}
+                            <div className="block lg:hidden mb-6">
+                                <DataFlowVisual state={step.state} />
+                            </div>
 
-                            {i === 2 && (
-                                <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-xs font-mono">
-                                    <Lock className="w-3 h-3" />
-                                    ENCRYPTED AT REST (AES-256)
-                                </div>
-                            )}
+                            <div className="p-6 rounded-2xl bg-white/5 border border-white/10 lg:p-0 lg:bg-transparent lg:border-none">
+                                <span className="text-xs font-mono text-surveilens-blue mb-2 block">STEP 0{i + 1}</span>
+                                <h3 className="text-2xl font-bold text-white mb-4">{step.title}</h3>
+                                <p className="text-zinc-400 leading-relaxed text-lg">{step.description}</p>
+
+                                {i === 2 && (
+                                    <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-xs font-mono">
+                                        <Lock className="w-3 h-3" />
+                                        ENCRYPTED AT REST (AES-256)
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>

@@ -67,7 +67,7 @@ export const Navbar = () => {
 
             {/* Mobile menu */}
             <div className={cn("md:hidden", isOpen ? "block" : "hidden")}>
-                <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3 bg-zinc-900/90 backdrop-blur-xl border-b border-white/5">
+                <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3 bg-zinc-900/90 backdrop-blur-xl border-b border-white/5 animate-fade-in">
                     {navLinks.map((link) => (
                         <Link
                             key={link.label}
