@@ -54,149 +54,137 @@ const STEPS: Step[] = [
 const HowToUseVisual = ({ activeIndex, totalSteps, isMobile = false }: { activeIndex: number, totalSteps: number, isMobile?: boolean }) => {
     return (
         <div className={cn(
-            "relative w-full rounded-2xl border border-white/10 bg-black/90 overflow-hidden shadow-2xl",
+            "relative w-full rounded-2xl border border-white/10 bg-black/80 overflow-hidden shadow-2xl transition-all duration-700",
             isMobile ? "aspect-[4/3] sm:aspect-video" : "aspect-video"
         )}>
-            {/* Animated Grid Background - Subtler on mobile */}
+            {/* --- BASE: Camera Mosaic Grid (Matches ProofSection) --- */}
             <div className={cn(
-                "absolute inset-0 grid gap-0.5 p-2 transition-opacity duration-1000",
-                isMobile ? "grid-cols-2 grid-rows-2 opacity-10" : "grid-cols-4 grid-rows-3 opacity-20"
+                "absolute inset-0 grid gap-1 p-2 transition-opacity duration-1000",
+                isMobile ? "grid-cols-2 grid-rows-4" : "grid-cols-2 sm:grid-cols-4 grid-rows-4 sm:grid-rows-3"
             )}>
-                {Array.from({ length: isMobile ? 4 : 12 }).map((_, i) => (
+                {Array.from({ length: 8 }).map((_, i) => (
                     <div
                         key={i}
-                        className="bg-zinc-800/50 rounded-sm flex items-center justify-center text-[7px] text-zinc-600 font-mono"
+                        className={cn(
+                            "relative rounded-sm overflow-hidden flex items-center justify-center",
+                            "bg-zinc-900/80 border border-white/5",
+                            isMobile && i >= 6 && "hidden sm:flex"
+                        )}
                     >
-                        CAM-{String(i + 1).padStart(2, "0")}
+                        {/* Fake camera view */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50" />
+                        <span className="relative text-[7px] sm:text-[9px] text-zinc-600 font-mono">
+                            CAM-{String(i + 1).padStart(2, "0")}
+                        </span>
+                        {/* Status indicator */}
+                        <div className="absolute top-1 right-1 w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-green-500/60" />
                     </div>
                 ))}
             </div>
 
-            {/* Scan Line Effect - Global definition */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
-                <div className="absolute inset-y-0 left-0 w-px bg-surveilens-blue/40 shadow-[0_0_15px_rgba(43,106,255,0.6)] animate-[scan_4s_linear_infinite]" />
+            {/* Existing System Label */}
+            <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-zinc-800/80 rounded text-[7px] sm:text-[10px] text-zinc-400 font-mono border border-white/10 opacity-30">
+                EXISTING VMS
             </div>
 
-            {/* Step 1: System Boot-up / Overlay Layer */}
+            {/* Scanning Line Animation */}
+            <div className="absolute inset-y-0 left-0 w-px bg-surveilens-blue/30 shadow-[0_0_15px_rgba(43,106,255,0.5)] z-10 animate-[scan_4s_linear_infinite]" />
+
+            {/* --- LAYER: Surveilens Overlay (Matches ProofSection) --- */}
             <div className={cn(
-                "absolute inset-0 transition-all duration-700 flex items-center justify-center",
-                activeIndex >= 0 ? "opacity-100" : "opacity-0"
+                "absolute -inset-1 sm:-inset-2 rounded-2xl sm:rounded-3xl border sm:border-2 border-surveilens-blue/40 pointer-events-none transition-all duration-700",
+                activeIndex >= 0 ? "opacity-100 animate-slow-pulse" : "opacity-0"
             )}>
+                {/* Overlay Badge Top */}
                 <div className={cn(
-                    "absolute inset-4 border border-surveilens-blue/30 rounded-xl transition-all duration-1000",
-                    activeIndex === 0 && "animate-[glitch_2s_infinite]"
+                    "absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-1 sm:py-1.5 bg-surveilens-blue text-white text-[10px] sm:text-sm font-semibold rounded-full shadow-lg shadow-surveilens-blue/30 whitespace-nowrap transition-all duration-500",
+                    activeIndex === 0 ? "scale-110 animate-[glitch_1s_infinite]" : "scale-100"
                 )}>
-                    {/* Corners */}
-                    <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-surveilens-blue/60 rounded-tl-lg" />
-                    <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-surveilens-blue/60 rounded-br-lg" />
+                    + SURVEILENS OVERLAY
                 </div>
 
+                {/* Corner Accents */}
+                <div className="absolute top-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-l border-t sm:border-l-2 sm:border-t-2 border-surveilens-blue rounded-tl-lg sm:rounded-tl-xl transition-all duration-500" />
+                <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-r border-t sm:border-r-2 sm:border-t-2 border-surveilens-blue rounded-tr-lg sm:rounded-tr-xl transition-all duration-500" />
+                <div className="absolute bottom-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-l border-b sm:border-l-2 sm:border-b-2 border-surveilens-blue rounded-bl-lg sm:rounded-bl-xl transition-all duration-500" />
+                <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-r border-b sm:border-r-2 sm:border-b-2 border-surveilens-blue rounded-br-lg sm:rounded-br-xl transition-all duration-500" />
+
+                {/* Detection Zone Highlight (Step 2 Activation) */}
                 <div className={cn(
-                    "px-4 py-2 bg-surveilens-blue/10 border border-surveilens-blue/30 rounded-lg backdrop-blur-md transition-all duration-500",
-                    activeIndex === 0 ? "scale-100 shadow-[0_0_30px_rgba(43,106,255,0.2)]" : "scale-90"
+                    "absolute top-1/4 left-1/4 w-1/3 h-1/3 border sm:border-2 border-dashed border-surveilens-blue/50 rounded-lg transition-all duration-1000 overflow-hidden",
+                    activeIndex >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-95"
                 )}>
-                    <span className="text-[10px] sm:text-xs font-mono text-surveilens-blue font-bold tracking-tighter">
-                        SYSTEM STATUS: ACTIVE
-                    </span>
-                    <div className="h-0.5 w-full bg-surveilens-blue/20 mt-1 overflow-hidden">
-                        <div className="h-full bg-surveilens-blue animate-[scan_2s_linear_infinite]" style={{ width: '30%' }} />
+                    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path
+                            d="M 0 0 L 100 0 L 100 100 L 0 100 Z"
+                            fill="rgba(43,106,255,0.05)"
+                            stroke="rgba(43,106,255,0.3)"
+                            strokeWidth="4"
+                            strokeDasharray="400"
+                            className={cn(
+                                "transition-all duration-[1500ms]",
+                                activeIndex >= 1 ? "animate-[draw-path_2s_forwards]" : "stroke-dashoffset-400"
+                            )}
+                        />
+                    </svg>
+                    <div className="absolute -top-3 left-2 px-1 py-0.5 bg-surveilens-blue/20 text-surveilens-blue text-[7px] sm:text-[8px] font-bold rounded">
+                        ZONE A
                     </div>
                 </div>
+
+                {/* Signal Active Indicator (Step 4 Activation) */}
+                <div className={cn(
+                    "absolute bottom-4 sm:bottom-8 right-4 sm:right-8 flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-black/90 rounded-xl border transition-all duration-500",
+                    activeIndex >= 3 ? "border-surveilens-blue/50 opacity-100 translate-y-0" : "border-white/10 opacity-0 translate-y-4 shadow-xl"
+                )}>
+                    <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-surveilens-blue animate-ping" />
+                    <span className="text-[10px] sm:text-xs text-white font-medium whitespace-nowrap uppercase tracking-tight">Signal Active</span>
+                    {/* Radar Bloom for Step 4 Pop */}
+                    {activeIndex === 3 && (
+                        <div className="absolute inset-x-0 h-full bg-surveilens-blue/20 animate-[bloom_1.5s_infinite] rounded-lg -z-10" />
+                    )}
+                </div>
             </div>
 
-            {/* Step 2: SVG Path Drawing for Zones */}
+            {/* Step 3: Toggle Panel (Appears on top for specific step) */}
             <div className={cn(
-                "absolute inset-0 transition-all duration-700 pointer-events-none",
-                activeIndex >= 1 ? "opacity-100" : "opacity-0"
+                "absolute top-4 right-4 bg-black/95 border border-white/10 rounded-xl p-3 space-y-2 backdrop-blur-xl transition-all duration-700 z-20 shadow-2xl",
+                activeIndex === 2 ? "opacity-100 translate-x-0" : (activeIndex > 2 ? "opacity-40 translate-x-0" : "opacity-0 translate-x-8")
             )}>
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 225">
-                    {/* Zone A path drawing */}
-                    <path
-                        d="M 100 60 L 250 60 L 250 140 L 100 140 Z"
-                        fill="rgba(43,106,255,0.05)"
-                        stroke="rgba(43,106,255,0.5)"
-                        strokeWidth="2"
-                        strokeDasharray="1000"
-                        className={cn(
-                            "transition-all duration-[2000ms] ease-in-out",
-                            activeIndex >= 1 ? "animate-[draw-path_3s_forwards]" : "stroke-dashoffset-1000"
-                        )}
-                    />
-                    {/* Text tag positioned at the path start */}
-                    <foreignObject x="105" y="65" width="60" height="20">
-                        <div className="text-[8px] font-bold text-white bg-surveilens-blue/40 px-1.5 py-0.5 rounded border border-white/20">
-                            ZONE A
-                        </div>
-                    </foreignObject>
-                </svg>
-            </div>
-
-            {/* Step 3: Toggles with Light Sweep */}
-            <div className={cn(
-                "absolute top-4 right-4 bg-black/60 border border-white/10 rounded-xl p-3 space-y-2 backdrop-blur-xl transition-all duration-700",
-                activeIndex === 2 ? "translate-x-0 opacity-100 shadow-[0_0_40px_rgba(43,106,255,0.1)]" : (activeIndex > 2 ? "opacity-40 translate-x-0" : "translate-x-8 opacity-0")
-            )}>
-                {["Intrusion", "Violence", "Loitering"].map((label, idx) => (
+                <div className="text-[8px] text-zinc-500 font-mono mb-1 uppercase tracking-widest">Detection Settings</div>
+                {["Violence", "Intrusion", "Access"].map((label, idx) => (
                     <div key={label} className="flex items-center justify-between gap-6">
-                        <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-wider">{label}</span>
+                        <span className="text-[9px] text-zinc-300 font-medium tracking-tight">{label}</span>
                         <div className={cn(
-                            "w-8 h-4 rounded-full relative transition-all duration-500",
+                            "w-7 h-3.5 rounded-full relative transition-all duration-500",
                             activeIndex >= 2 ? "bg-surveilens-blue" : "bg-zinc-800"
                         )} style={{ transitionDelay: `${idx * 150}ms` }}>
                             <div className={cn(
-                                "absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all duration-500 shadow-md",
-                                activeIndex >= 2 ? "left-4.5" : "left-0.5"
+                                "absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all duration-500 shadow-sm",
+                                activeIndex >= 2 ? "left-4" : "left-0.5"
                             )} />
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Step 4: Radar Ping Alert Entrance */}
+            {/* Step 5: Action Buttons */}
             <div className={cn(
-                "absolute bottom-6 sm:bottom-10 left-4 sm:left-6 right-4 sm:right-6 p-3 sm:p-5 rounded-xl bg-black/80 border transition-all duration-700 flex items-center gap-4 backdrop-blur-2xl overflow-hidden",
-                activeIndex >= 3
-                    ? "border-surveilens-blue/50 opacity-100 translate-y-0 shadow-[0_20px_40px_-15px_rgba(43,106,255,0.3)]"
-                    : "border-transparent opacity-0 translate-y-8"
-            )}>
-                {/* Radar Bloom Background */}
-                {activeIndex === 3 && (
-                    <div className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-surveilens-blue/20 rounded-full animate-[bloom_1.5s_infinite]" />
-                )}
-
-                <div className="relative shrink-0">
-                    <div className="h-10 w-10 sm:h-12 sm:w-12 bg-surveilens-blue/20 rounded-xl flex items-center justify-center border border-surveilens-blue/30">
-                        <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-surveilens-blue" />
-                    </div>
-                    {/* Live blip */}
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-surveilens-blue rounded-full border-2 border-black" />
-                </div>
-                <div className="flex-1 min-w-0">
-                    <div className="text-white text-sm sm:text-base font-bold tracking-tight truncate">HIGH THREAT SIGNAL</div>
-                    <div className="text-zinc-500 text-[9px] sm:text-xs font-mono uppercase truncate tracking-widest mt-0.5">Hallway C • Cam-09 • 10:24 PM</div>
-                </div>
-                <div className="hidden sm:flex flex-col items-end shrink-0">
-                    <span className="text-[10px] px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full font-bold animate-pulse">CRITICAL</span>
-                </div>
-            </div>
-
-            {/* Step 5: High-Impact Action Buttons */}
-            <div className={cn(
-                "absolute bottom-3 left-3 right-3 flex gap-2 transition-all duration-700",
+                "absolute bottom-4 left-4 right-4 flex gap-2 transition-all duration-700 z-20",
                 activeIndex >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
-                <button className="flex-1 py-3 text-[10px] font-bold uppercase tracking-widest bg-zinc-900 text-zinc-400 rounded-lg border border-white/5 hover:bg-zinc-800 transition-all">
-                    ACKNOWLEDGE
+                <button className="flex-1 py-2 sm:py-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-zinc-900/80 text-zinc-400 rounded-lg border border-white/5 backdrop-blur-md">
+                    DISMISS
                 </button>
-                <button className="flex-2 py-3 text-[10px] font-bold uppercase tracking-widest bg-surveilens-blue text-white rounded-lg shadow-lg shadow-surveilens-blue/30 hover:bg-blue-600 transition-all border border-white/10">
-                    ESCAlATE TO SECURITY →
+                <button className="flex-2 py-2 sm:py-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-surveilens-blue text-white rounded-lg shadow-lg shadow-surveilens-blue/40 border border-white/10">
+                    ESCALATE →
                 </button>
             </div>
 
-            {/* Progress Bar - Thicker & Glowing */}
-            <div className="absolute bottom-0 left-0 right-0 h-1 sm:h-1.5 bg-zinc-900">
+            {/* Base Progress Indicator */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-zinc-900/50">
                 <div
-                    className="h-full bg-gradient-to-r from-surveilens-blue to-blue-400 transition-all duration-700 shadow-[0_0_20px_rgba(43,106,255,0.8)]"
+                    className="h-full bg-surveilens-blue transition-all duration-700 shadow-[0_0_15px_rgba(43,106,255,1)]"
                     style={{ width: `${((activeIndex + 1) / totalSteps) * 100}%` }}
                 />
             </div>
@@ -331,16 +319,6 @@ export const HowToUseScroll = () => {
                     ))}
                 </div>
             </div>
-
-            {/* CSS for scan animation */}
-            <style jsx>{`
-                @keyframes scan {
-                    0% { top: -2px; opacity: 0; }
-                    10% { opacity: 1; }
-                    90% { opacity: 1; }
-                    100% { top: 100%; opacity: 0; }
-                }
-            `}</style>
         </section>
     );
 };
