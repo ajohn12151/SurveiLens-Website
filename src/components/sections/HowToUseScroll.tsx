@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Server, MapPin, ToggleLeft, Bell, CheckCircle, LucideIcon } from "lucide-react";
+import { Server, MapPin, ToggleLeft, Bell, CheckCircle, LucideIcon, ShieldAlert } from "lucide-react";
 
 // Data Structure
 interface Step {
@@ -52,137 +52,176 @@ const STEPS: Step[] = [
 ];
 
 const HowToUseVisual = ({ activeIndex, totalSteps, isMobile = false }: { activeIndex: number, totalSteps: number, isMobile?: boolean }) => {
+    // Cinematic Step 1 logic: Show black for 1000ms, then reveal grid
+    const [isRevealed, setIsRevealed] = useState(false);
+
+    useEffect(() => {
+        if (activeIndex === 0) {
+            setIsRevealed(false);
+            const timer = setTimeout(() => setIsRevealed(true), 1000);
+            return () => clearTimeout(timer);
+        } else {
+            setIsRevealed(true);
+        }
+    }, [activeIndex]);
+
     return (
         <div className={cn(
-            "relative w-full rounded-2xl border border-white/10 bg-black/80 overflow-hidden shadow-2xl transition-all duration-700",
-            isMobile ? "aspect-[4/3] sm:aspect-video" : "aspect-video"
+            "relative w-full rounded-2xl border border-white/10 bg-black overflow-hidden shadow-2xl transition-all duration-700 mx-auto",
+            isMobile ? "aspect-[16/10]" : "aspect-video"
         )}>
-            {/* --- BASE: Camera Mosaic Grid (Matches ProofSection) --- */}
+            {/* --- BASE: Camera Mosaic Grid (Cinematic Reveal) --- */}
             <div className={cn(
-                "absolute inset-0 grid gap-1 p-2 transition-opacity duration-1000",
-                isMobile ? "grid-cols-2 grid-rows-4" : "grid-cols-2 sm:grid-cols-4 grid-rows-4 sm:grid-rows-3"
+                "absolute inset-0 grid gap-1 p-2 transition-all duration-1000 ease-out",
+                isRevealed ? "opacity-100 scale-100" : "opacity-0 scale-110",
+                "grid-cols-4 grid-rows-2"
             )}>
                 {Array.from({ length: 8 }).map((_, i) => (
                     <div
                         key={i}
                         className={cn(
-                            "relative rounded-sm overflow-hidden flex items-center justify-center",
-                            "bg-zinc-900/80 border border-white/5",
-                            isMobile && i >= 6 && "hidden sm:flex"
+                            "relative rounded-sm overflow-hidden flex items-center justify-center transition-all duration-1000",
+                            "bg-zinc-900 border border-white/5"
                         )}
+                        style={{ transitionDelay: isRevealed ? `${i * 50}ms` : "0ms" }}
                     >
-                        {/* Fake camera view */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50" />
-                        <span className="relative text-[7px] sm:text-[9px] text-zinc-600 font-mono">
-                            CAM-{String(i + 1).padStart(2, "0")}
+                        <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-black/80" />
+                        <span className="relative text-[7px] sm:text-[8px] text-zinc-700 font-mono">
+                            {String(i + 1).padStart(2, "0")}
                         </span>
-                        {/* Status indicator */}
-                        <div className="absolute top-1 right-1 w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-green-500/60" />
+                        <div className="absolute top-1 right-1 w-1 h-1 rounded-full bg-green-500/20" />
                     </div>
                 ))}
             </div>
 
             {/* Existing System Label */}
-            <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-zinc-800/80 rounded text-[7px] sm:text-[10px] text-zinc-400 font-mono border border-white/10 opacity-30">
-                EXISTING VMS
+            <div className={cn(
+                "absolute bottom-2 left-2 px-1.5 py-0.5 bg-zinc-800/80 rounded text-[7px] sm:text-[9px] text-zinc-500 font-mono border border-white/5 transition-opacity duration-1000",
+                isRevealed ? "opacity-40" : "opacity-0"
+            )}>
+                VMS_ACTIVE
             </div>
 
             {/* Scanning Line Animation */}
-            <div className="absolute inset-y-0 left-0 w-px bg-surveilens-blue/30 shadow-[0_0_15px_rgba(43,106,255,0.5)] z-10 animate-[scan_4s_linear_infinite]" />
-
-            {/* --- LAYER: Surveilens Overlay (Matches ProofSection) --- */}
             <div className={cn(
-                "absolute -inset-1 sm:-inset-2 rounded-2xl sm:rounded-3xl border sm:border-2 border-surveilens-blue/40 pointer-events-none transition-all duration-700",
-                activeIndex >= 0 ? "opacity-100 animate-slow-pulse" : "opacity-0"
+                "absolute inset-y-0 left-0 w-px bg-surveilens-blue/40 shadow-[0_0_15px_rgba(43,106,255,0.6)] z-10 animate-[scan_4s_linear_infinite] transition-opacity duration-1000",
+                isRevealed ? "opacity-100" : "opacity-0"
+            )} />
+
+            {/* --- LAYER: Surveilens Overlay --- */}
+            <div className={cn(
+                "absolute -inset-1 sm:-inset-1.5 rounded-2xl sm:rounded-3xl border sm:border-2 border-surveilens-blue/40 pointer-events-none transition-all duration-700 z-20",
+                isRevealed ? "opacity-100 animate-slow-pulse" : "opacity-0"
             )}>
-                {/* Overlay Badge Top */}
-                <div className={cn(
-                    "absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-1 sm:py-1.5 bg-surveilens-blue text-white text-[10px] sm:text-sm font-semibold rounded-full shadow-lg shadow-surveilens-blue/30 whitespace-nowrap transition-all duration-500",
-                    activeIndex === 0 ? "scale-110 animate-[glitch_1s_infinite]" : "scale-100"
-                )}>
-                    + SURVEILENS OVERLAY
-                </div>
-
                 {/* Corner Accents */}
-                <div className="absolute top-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-l border-t sm:border-l-2 sm:border-t-2 border-surveilens-blue rounded-tl-lg sm:rounded-tl-xl transition-all duration-500" />
-                <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-r border-t sm:border-r-2 sm:border-t-2 border-surveilens-blue rounded-tr-lg sm:rounded-tr-xl transition-all duration-500" />
-                <div className="absolute bottom-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-l border-b sm:border-l-2 sm:border-b-2 border-surveilens-blue rounded-bl-lg sm:rounded-bl-xl transition-all duration-500" />
-                <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-r border-b sm:border-r-2 sm:border-b-2 border-surveilens-blue rounded-br-lg sm:rounded-br-xl transition-all duration-500" />
+                <div className="absolute top-0 left-0 w-4 h-4 sm:w-8 sm:h-8 border-l border-t sm:border-l-2 sm:border-t-2 border-surveilens-blue rounded-tl-lg sm:rounded-tl-xl transition-all duration-500" />
+                <div className="absolute top-0 right-0 w-4 h-4 sm:w-8 sm:h-8 border-r border-t sm:border-r-2 sm:border-t-2 border-surveilens-blue rounded-tr-lg sm:rounded-tr-xl transition-all duration-500" />
+                <div className="absolute bottom-0 left-0 w-4 h-4 sm:w-8 sm:h-8 border-l border-b sm:border-l-2 sm:border-b-2 border-surveilens-blue rounded-bl-lg sm:rounded-bl-xl transition-all duration-500" />
+                <div className="absolute bottom-0 right-0 w-4 h-4 sm:w-8 sm:h-8 border-r border-b sm:border-r-2 sm:border-b-2 border-surveilens-blue rounded-br-lg sm:rounded-br-xl transition-all duration-500" />
 
-                {/* Detection Zone Highlight (Step 2 Activation) */}
+                {/* --- Step 2: SVG Zone Drawing --- */}
                 <div className={cn(
-                    "absolute top-1/4 left-1/4 w-1/3 h-1/3 border sm:border-2 border-dashed border-surveilens-blue/50 rounded-lg transition-all duration-1000 overflow-hidden",
-                    activeIndex >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                    "absolute inset-0 transition-all duration-700",
+                    activeIndex >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
                 )}>
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
                         <path
-                            d="M 0 0 L 100 0 L 100 100 L 0 100 Z"
+                            d="M 15 25 L 45 25 L 45 55 L 15 55 Z"
                             fill="rgba(43,106,255,0.05)"
-                            stroke="rgba(43,106,255,0.3)"
-                            strokeWidth="4"
-                            strokeDasharray="400"
+                            stroke="rgba(43,106,255,0.5)"
+                            strokeWidth="1"
+                            strokeDasharray="200"
                             className={cn(
-                                "transition-all duration-[1500ms]",
-                                activeIndex >= 1 ? "animate-[draw-path_2s_forwards]" : "stroke-dashoffset-400"
+                                "transition-all duration-[2000ms]",
+                                activeIndex >= 1 ? "animate-[draw-path_2.5s_forwards]" : "stroke-dashoffset-200"
                             )}
                         />
                     </svg>
-                    <div className="absolute -top-3 left-2 px-1 py-0.5 bg-surveilens-blue/20 text-surveilens-blue text-[7px] sm:text-[8px] font-bold rounded">
-                        ZONE A
+                    <div className={cn(
+                        "absolute top-[26%] left-[16%] px-1.5 py-0.5 bg-surveilens-blue text-white text-[7px] font-black rounded border border-white/20 shadow-lg backdrop-blur-sm transition-all duration-1000 delay-500",
+                        activeIndex >= 1 ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2"
+                    )}>
+                        ZONE_01
                     </div>
                 </div>
 
-                {/* Signal Active Indicator (Step 4 Activation) */}
+                {/* --- Step 3: Precise Toggles --- */}
                 <div className={cn(
-                    "absolute bottom-4 sm:bottom-8 right-4 sm:right-8 flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-black/90 rounded-xl border transition-all duration-500",
-                    activeIndex >= 3 ? "border-surveilens-blue/50 opacity-100 translate-y-0" : "border-white/10 opacity-0 translate-y-4 shadow-xl"
+                    "absolute top-3 right-3 bg-black/95 border border-white/10 rounded-xl p-2.5 space-y-1.5 backdrop-blur-xl transition-all duration-700 z-30 shadow-2xl",
+                    activeIndex === 2 ? "opacity-100 translate-x-0" : (activeIndex > 2 ? "opacity-40 translate-x-0 scale-95" : "opacity-0 translate-x-4")
                 )}>
-                    <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-surveilens-blue animate-ping" />
-                    <span className="text-[10px] sm:text-xs text-white font-medium whitespace-nowrap uppercase tracking-tight">Signal Active</span>
-                    {/* Radar Bloom for Step 4 Pop */}
-                    {activeIndex === 3 && (
-                        <div className="absolute inset-x-0 h-full bg-surveilens-blue/20 animate-[bloom_1.5s_infinite] rounded-lg -z-10" />
-                    )}
-                </div>
-            </div>
-
-            {/* Step 3: Toggle Panel (Appears on top for specific step) */}
-            <div className={cn(
-                "absolute top-4 right-4 bg-black/95 border border-white/10 rounded-xl p-3 space-y-2 backdrop-blur-xl transition-all duration-700 z-20 shadow-2xl",
-                activeIndex === 2 ? "opacity-100 translate-x-0" : (activeIndex > 2 ? "opacity-40 translate-x-0" : "opacity-0 translate-x-8")
-            )}>
-                <div className="text-[8px] text-zinc-500 font-mono mb-1 uppercase tracking-widest">Detection Settings</div>
-                {["Violence", "Intrusion", "Access"].map((label, idx) => (
-                    <div key={label} className="flex items-center justify-between gap-6">
-                        <span className="text-[9px] text-zinc-300 font-medium tracking-tight">{label}</span>
-                        <div className={cn(
-                            "w-7 h-3.5 rounded-full relative transition-all duration-500",
-                            activeIndex >= 2 ? "bg-surveilens-blue" : "bg-zinc-800"
-                        )} style={{ transitionDelay: `${idx * 150}ms` }}>
+                    <div className="text-[7px] text-zinc-500 font-mono mb-1 uppercase tracking-tight">Detection_Signals</div>
+                    {["Aggression", "Intrusion", "Crowds"].map((label, idx) => (
+                        <div key={label} className="flex items-center justify-between gap-4">
+                            <span className="text-[8px] text-zinc-400 font-bold">{label}</span>
                             <div className={cn(
-                                "absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white transition-all duration-500 shadow-sm",
-                                activeIndex >= 2 ? "left-4" : "left-0.5"
-                            )} />
+                                "w-6 h-3 rounded-full relative transition-all duration-500",
+                                activeIndex >= 2 ? "bg-surveilens-blue" : "bg-zinc-800"
+                            )} style={{ transitionDelay: `${idx * 150}ms` }}>
+                                <div className={cn(
+                                    "absolute top-0.5 w-2 h-2 rounded-full bg-white transition-all duration-500",
+                                    activeIndex >= 2 ? "left-[14px]" : "left-0.5"
+                                )} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* --- Step 4: THREAT Alert (Smaller and Lower) --- */}
+                <div className={cn(
+                    "absolute left-1/2 -translate-x-1/2 w-[75%] max-w-[240px] transition-all duration-700 z-40",
+                    isMobile ? "bottom-8" : "bottom-12",
+                    activeIndex === 3 ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-90 translate-y-4"
+                )}>
+                    <div className="bg-black/95 border border-surveilens-blue/40 rounded-xl p-3 shadow-[0_0_40px_rgba(43,106,255,0.3)] backdrop-blur-2xl">
+                        <div className="flex items-center gap-2.5">
+                            <div className="h-8 w-8 bg-surveilens-blue/20 rounded-lg flex items-center justify-center shrink-0 border border-surveilens-blue/30 relative">
+                                <ShieldAlert className="h-4 w-4 text-surveilens-blue" />
+                                <div className="absolute inset-0 bg-surveilens-blue/20 animate-ping rounded-lg" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-white text-xs font-black tracking-tight uppercase leading-none">Signal_Alarm</div>
+                                <div className="text-zinc-500 text-[7px] font-mono mt-0.5 uppercase">CAM-02 • ZONE-1 • 98%</div>
+                            </div>
                         </div>
                     </div>
-                ))}
+                </div>
+
+                {/* --- Step 5: High-Impact Review Actions --- */}
+                <div className={cn(
+                    "absolute inset-x-3 bottom-3 flex flex-col gap-2 transition-all duration-700 z-50",
+                    activeIndex >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                )}>
+                    <div className="flex gap-1.5">
+                        <button className="flex-1 py-2 text-[8px] font-black uppercase tracking-tight bg-zinc-900 text-zinc-500 rounded-lg border border-white/5 transition-all hover:text-white">
+                            DISMISS
+                        </button>
+                        <button className="flex-[2] py-2 text-[8px] font-black uppercase tracking-tight bg-surveilens-blue text-white rounded-lg shadow-lg border border-white/10 transition-all hover:bg-blue-600">
+                            ESCALATE_NOW →
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            {/* Step 5: Action Buttons */}
-            <div className={cn(
-                "absolute bottom-4 left-4 right-4 flex gap-2 transition-all duration-700 z-20",
-                activeIndex >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-            )}>
-                <button className="flex-1 py-2 sm:py-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-zinc-900/80 text-zinc-400 rounded-lg border border-white/5 backdrop-blur-md">
-                    DISMISS
-                </button>
-                <button className="flex-2 py-2 sm:py-3 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider bg-surveilens-blue text-white rounded-lg shadow-lg shadow-surveilens-blue/40 border border-white/10">
-                    ESCALATE →
-                </button>
-            </div>
+            {/* --- Initialization Overlay (Cinematic Step 1) --- */}
+            {activeIndex === 0 && !isRevealed && (
+                <div className="absolute inset-0 bg-black z-[25] flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-3 animate-fade-in">
+                        <div className="relative h-1 w-32 sm:w-48 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-surveilens-blue animate-[scan_1.5s_linear_infinite]" style={{ width: '40%' }} />
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-surveilens-blue rounded-full animate-ping" />
+                            <span className="text-[8px] sm:text-[10px] font-mono text-surveilens-blue/80 tracking-[0.2em] font-bold uppercase">
+                                Initializing_System_Core...
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Base Progress Indicator */}
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-zinc-900/50">
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-zinc-900/50 z-50">
                 <div
                     className="h-full bg-surveilens-blue transition-all duration-700 shadow-[0_0_15px_rgba(43,106,255,1)]"
                     style={{ width: `${((activeIndex + 1) / totalSteps) * 100}%` }}
@@ -226,17 +265,17 @@ export const HowToUseScroll = () => {
     }, []);
 
     return (
-        <section id="howToUse" className="relative py-16 min-h-screen bg-black/40">
+        <section id="howToUse" className="relative py-24 min-h-screen bg-black/40">
             {/* Section Header */}
-            <div className="text-center pb-8 px-6">
-                <span className="text-xs font-mono text-surveilens-blue uppercase tracking-widest">
-                    Getting Started
+            <div className="text-center pb-12 px-6">
+                <span className="text-xs font-mono text-surveilens-blue uppercase tracking-widest mb-4 block">
+                    Protocol: Deployment
                 </span>
             </div>
 
             <div className="max-w-7xl mx-auto px-6">
                 {/* Desktop Layout */}
-                <div className="hidden lg:grid lg:grid-cols-2 gap-12 items-start">
+                <div className="hidden lg:grid lg:grid-cols-2 gap-16 items-start">
                     {/* Left: Scrolling Cards */}
                     <div className="space-y-[50vh] py-[25vh]">
                         {STEPS.map((step, i) => (
@@ -244,76 +283,87 @@ export const HowToUseScroll = () => {
                                 key={step.id}
                                 ref={(el) => { cardRefs.current[i] = el; }}
                                 className={cn(
-                                    "min-h-[35vh] p-8 rounded-2xl border transition-all duration-500",
+                                    "min-h-[35vh] p-10 rounded-2xl border transition-all duration-500",
                                     activeIndex === i
-                                        ? "bg-surveilens-blue/10 border-surveilens-blue/50 shadow-[0_0_50px_rgba(43,106,255,0.2)] scale-100 opacity-100"
-                                        : "bg-black/40 border-white/5 opacity-40 scale-95"
+                                        ? "bg-surveilens-blue/10 border-surveilens-blue/40 shadow-[0_30px_60px_-15px_rgba(43,106,255,0.15)] scale-105 opacity-100 translate-x-4"
+                                        : "bg-black/40 border-white/5 opacity-30 scale-95"
                                 )}
                             >
-                                <div className="flex items-center gap-4 mb-6">
+                                <div className="flex items-center gap-5 mb-8">
                                     <span className={cn(
-                                        "flex h-14 w-14 items-center justify-center rounded-full text-xl font-bold transition-all duration-500",
+                                        "flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-black transition-all duration-500",
                                         activeIndex === i
-                                            ? "bg-surveilens-blue text-white shadow-lg shadow-surveilens-blue/30"
-                                            : "bg-white/10 text-zinc-500"
+                                            ? "bg-surveilens-blue text-white shadow-[0_10px_20px_rgba(43,106,255,0.3)] rotate-3"
+                                            : "bg-white/5 text-zinc-500 -rotate-3"
                                     )}>
-                                        {step.number}
+                                        0{step.number}
                                     </span>
-                                    <step.icon className={cn(
-                                        "h-7 w-7 transition-colors duration-300",
-                                        activeIndex === i ? "text-surveilens-blue" : "text-zinc-600"
-                                    )} />
+                                    <div className={cn(
+                                        "p-3 rounded-xl border transition-all duration-500",
+                                        activeIndex === i ? "bg-white/5 border-surveilens-blue/30" : "bg-transparent border-transparent"
+                                    )}>
+                                        <step.icon className={cn(
+                                            "h-8 w-8 transition-colors duration-300",
+                                            activeIndex === i ? "text-surveilens-blue" : "text-zinc-700"
+                                        )} />
+                                    </div>
                                 </div>
 
-                                <h3 className="text-2xl font-bold text-white mb-3">{step.title}</h3>
-                                <p className="text-lg text-zinc-300 leading-relaxed">{step.description}</p>
+                                <h3 className="text-3xl font-bold text-white mb-4 tracking-tight">{step.title}</h3>
+                                <p className="text-lg text-zinc-400 leading-relaxed max-w-md">{step.description}</p>
                             </div>
                         ))}
                     </div>
 
                     {/* Right: Sticky Stage */}
-                    <div className="sticky top-1/4 h-fit">
-                        <HowToUseVisual activeIndex={activeIndex} totalSteps={STEPS.length} />
+                    <div className="sticky top-[20vh] h-[60vh] flex items-center">
+                        <div className="w-full">
+                            <HowToUseVisual activeIndex={activeIndex} totalSteps={STEPS.length} />
 
-                        {/* Step Indicator */}
-                        <div className="flex justify-center gap-2 mt-5">
-                            {STEPS.map((_, i) => (
-                                <div
-                                    key={i}
-                                    className={cn(
-                                        "rounded-full transition-all duration-500",
-                                        activeIndex === i
-                                            ? "w-8 h-2 bg-surveilens-blue shadow-lg shadow-surveilens-blue/30"
-                                            : "w-2 h-2 bg-white/20"
-                                    )}
-                                />
-                            ))}
+                            {/* Step Indicator */}
+                            <div className="flex justify-center gap-3 mt-10">
+                                {STEPS.map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className={cn(
+                                            "rounded-full transition-all duration-700",
+                                            activeIndex === i
+                                                ? "w-12 h-1.5 bg-surveilens-blue shadow-[0_0_10px_rgba(43,106,255,0.8)]"
+                                                : "w-1.5 h-1.5 bg-white/20"
+                                        )}
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Mobile: Simple Stack */}
-                <div className="lg:hidden space-y-12">
+                {/* Mobile: Focused Stack */}
+                <div className="lg:hidden space-y-20">
                     {STEPS.map((step, i) => (
                         <div
                             key={step.id}
-                            className="space-y-6 opacity-0 animate-[fade-in-up_0.7s_ease-out_forwards]"
+                            className="space-y-8 opacity-0 animate-[fade-in-up_1s_ease-out_forwards]"
                             style={{ animationDelay: `${i * 150}ms` }}
                         >
                             {/* Mobile Visual - focused view for this specific step */}
-                            <HowToUseVisual activeIndex={i} totalSteps={STEPS.length} isMobile={true} />
+                            <div className="px-2">
+                                <HowToUseVisual activeIndex={i} totalSteps={STEPS.length} isMobile={true} />
+                            </div>
 
-                            <div className="p-6 rounded-2xl bg-black/60 border border-white/10 mx-2 shadow-xl backdrop-blur-md">
-                                <div className="flex items-center gap-4 mb-4">
-                                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surveilens-blue text-white font-bold shadow-lg shadow-surveilens-blue/20">
-                                        {step.number}
-                                    </span>
-                                    <div className="p-2 bg-white/5 rounded-lg border border-white/5">
-                                        <step.icon className="h-5 w-5 text-surveilens-blue" />
-                                    </div>
+                            <div className="p-8 rounded-3xl bg-zinc-900/60 border border-white/10 mx-2 shadow-2xl backdrop-blur-md relative overflow-hidden group">
+                                {/* Number accent */}
+                                <div className="absolute -top-4 -right-4 text-7xl font-black text-white/5 select-none transition-transform duration-700 group-hover:-translate-x-2 group-hover:translate-y-2">
+                                    0{step.number}
                                 </div>
-                                <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                                <p className="text-zinc-400 text-sm leading-relaxed">{step.description}</p>
+
+                                <div className="flex items-center gap-5 mb-6">
+                                    <div className="p-3 bg-surveilens-blue/20 rounded-2xl border border-surveilens-blue/30 shadow-inner">
+                                        <step.icon className="h-7 w-7 text-surveilens-blue" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-white tracking-tight">{step.title}</h3>
+                                </div>
+                                <p className="text-zinc-400 text-base leading-relaxed">{step.description}</p>
                             </div>
                         </div>
                     ))}
