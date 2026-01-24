@@ -51,35 +51,29 @@ const STEPS: Step[] = [
     },
 ];
 
-const HowToUseVisual = ({ activeIndex, currentStep, totalSteps, isMobile = false }: { activeIndex: number, currentStep: number, totalSteps: number, isMobile?: boolean }) => {
+const HowToUseVisual = ({ activeIndex, currentStep, sectionInView, isMobile = false }: { activeIndex: number, currentStep: number, sectionInView: boolean, isMobile?: boolean }) => {
     // Cinematic Step 1 logic: Show black for 1000ms, then reveal grid
-    // For mobile, we use a local ref because each card has its own visual component
     const [isRevealed, setIsRevealed] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        // If this specific visual component is the active one in the scroll sequence
-        if (activeIndex === currentStep) {
-            // Delay the reveal for Step 1 aesthetic
+        // Trigger reveal only when section is in view and we are on the relevant step
+        if (sectionInView && activeIndex === currentStep) {
             const timer = setTimeout(() => setIsRevealed(true), 1000);
             return () => clearTimeout(timer);
         } else if (activeIndex > currentStep) {
-            // Already passed this step, keep it revealed but static
+            // If we've already passed this step, keep it revealed
             setIsRevealed(true);
-        } else {
-            // Step not reached yet or inactive
+        } else if (!sectionInView && activeIndex === 0) {
+            // Reset Step 1 if scrolled completely away
             setIsRevealed(false);
         }
-    }, [activeIndex, currentStep]);
+    }, [activeIndex, currentStep, sectionInView]);
 
     return (
-        <div
-            ref={containerRef}
-            className={cn(
-                "relative w-full rounded-2xl border border-white/10 bg-black overflow-hidden shadow-2xl transition-all duration-700 mx-auto",
-                isMobile ? "aspect-[16/10]" : "aspect-video"
-            )}
-        >
+        <div className={cn(
+            "relative w-full rounded-2xl border border-white/10 bg-black overflow-hidden shadow-2xl transition-all duration-700 mx-auto",
+            isMobile ? "aspect-[16/10]" : "aspect-video"
+        )}>
             {/* --- BASE: Camera Mosaic Grid (Cinematic Reveal) --- */}
             <div className={cn(
                 "absolute inset-0 grid gap-1 p-2 transition-all duration-1000 ease-out",
@@ -131,7 +125,7 @@ const HowToUseVisual = ({ activeIndex, currentStep, totalSteps, isMobile = false
 
                 {/* --- Step 2: SVG Zone Drawing --- */}
                 <div className={cn(
-                    "absolute inset-0 transition-opacity duration-700",
+                    "absolute inset-0 transition-all duration-700",
                     activeIndex >= 1 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 pointer-events-none"
                 )}>
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -203,10 +197,10 @@ const HowToUseVisual = ({ activeIndex, currentStep, totalSteps, isMobile = false
                     activeIndex >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
                 )}>
                     <div className="flex gap-1.5">
-                        <button className="flex-1 py-2 text-[8px] font-black uppercase tracking-tight bg-zinc-900 text-zinc-500 rounded-lg border border-white/5 transition-colors hover:text-white">
+                        <button className="flex-1 py-3 text-[8px] font-bold uppercase tracking-tight bg-zinc-900 text-zinc-500 rounded-lg border border-white/5 transition-colors hover:text-white">
                             DISMISS
                         </button>
-                        <button className="flex-[2] py-2 text-[8px] font-black uppercase tracking-tight bg-surveilens-blue text-white rounded-lg shadow-lg border border-white/10 transition-all hover:bg-blue-600">
+                        <button className="flex-[2] py-3 text-[8px] font-bold uppercase tracking-tight bg-surveilens-blue text-white rounded-lg shadow-lg border border-white/10 transition-all hover:bg-blue-600">
                             ESCALATE_NOW →
                         </button>
                     </div>
@@ -214,11 +208,11 @@ const HowToUseVisual = ({ activeIndex, currentStep, totalSteps, isMobile = false
             </div>
 
             {/* --- Initialization Overlay (Cinematic Step 1) --- */}
-            {currentStep === 0 && activeIndex === 0 && !isRevealed && (
+            {activeIndex === 0 && !isRevealed && (
                 <div className="absolute inset-0 bg-black z-[25] flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-3 animate-fade-in">
+                    <div className="flex flex-col items-center gap-3">
                         <div className="relative h-1 w-32 sm:w-48 bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-surveilens-blue animate-[scan_1.5s_linear_infinite]" style={{ width: '40%' }} />
+                            <div className="h-full bg-surveilens-blue animate-[scan_1s_linear_infinite]" style={{ width: '40%' }} />
                         </div>
                         <div className="flex items-center gap-2">
                             <span className="w-1.5 h-1.5 bg-surveilens-blue rounded-full animate-ping" />
@@ -229,44 +223,36 @@ const HowToUseVisual = ({ activeIndex, currentStep, totalSteps, isMobile = false
                     </div>
                 </div>
             )}
-
-            {/* Base Progress Indicator - Only on Desktop sticky visual */}
-            {!isMobile && (
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-zinc-900/50 z-50">
-                    <div
-                        className="h-full bg-surveilens-blue transition-all duration-700 shadow-[0_0_15px_rgba(43,106,255,1)]"
-                        style={{ width: `${((activeIndex + 1) / totalSteps) * 100}%` }}
-                    />
-                </div>
-            )}
         </div>
     )
 }
 
 export const HowToUseScroll = () => {
-    // Start at -1 to prevent premature animation
-    const [activeIndex, setActiveIndex] = useState(-1);
+    // Restore default to 0 to prevent faint visuals on load
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [sectionInView, setSectionInView] = useState(false);
     const sectionRef = useRef<HTMLDivElement>(null);
     const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-    // Use IntersectionObserver for mobile cards to trigger their own animations
-    const [visibleSteps, setVisibleSteps] = useState<number[]>([]);
-
     useEffect(() => {
-        // Desktop scroll logic
+        // Desktop scroll and global section visibility logic
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setSectionInView(entry.isIntersecting);
+            },
+            { threshold: 0.2 } // Section is partially visible
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
         const handleScroll = () => {
             if (window.innerWidth < 1024) return;
 
             const viewportCenter = window.innerHeight / 2;
-            let closestIndex = -1;
+            let closestIndex = 0;
             let closestDistance = Infinity;
-
-            // Only track if the section is in the viewport
-            const sectionRect = sectionRef.current?.getBoundingClientRect();
-            if (!sectionRect || sectionRect.top > window.innerHeight || sectionRect.bottom < 0) {
-                if (activeIndex !== -1) setActiveIndex(-1);
-                return;
-            }
 
             cardRefs.current.forEach((card, index) => {
                 if (!card) return;
@@ -274,7 +260,7 @@ export const HowToUseScroll = () => {
                 const cardCenter = rect.top + rect.height / 2;
                 const distance = Math.abs(cardCenter - viewportCenter);
 
-                if (distance < closestDistance && distance < viewportCenter) {
+                if (distance < closestDistance) {
                     closestDistance = distance;
                     closestIndex = index;
                 }
@@ -285,29 +271,11 @@ export const HowToUseScroll = () => {
             }
         };
 
-        // Mobile intersection observer
-        const observers: IntersectionObserver[] = [];
-        if (window.innerWidth < 1024) {
-            cardRefs.current.forEach((card, index) => {
-                if (!card) return;
-                const observer = new IntersectionObserver(
-                    ([entry]) => {
-                        if (entry.isIntersecting) {
-                            setVisibleSteps(prev => [...new Set([...prev, index])]);
-                        }
-                    },
-                    { threshold: 0.6 } // Card must be 60% visible to trigger
-                );
-                observer.observe(card);
-                observers.push(observer);
-            });
-        }
-
         window.addEventListener("scroll", handleScroll, { passive: true });
         handleScroll();
         return () => {
             window.removeEventListener("scroll", handleScroll);
-            observers.forEach(o => o.disconnect());
+            observer.disconnect();
         };
     }, [activeIndex]);
 
@@ -371,7 +339,8 @@ export const HowToUseScroll = () => {
                         <div className="w-full">
                             <HowToUseVisual
                                 activeIndex={activeIndex}
-                                currentStep={activeIndex} // On desktop, visual is unified
+                                currentStep={activeIndex}
+                                sectionInView={sectionInView}
                                 totalSteps={STEPS.length}
                             />
 
@@ -398,15 +367,15 @@ export const HowToUseScroll = () => {
                     {STEPS.map((step, i) => (
                         <div
                             key={step.id}
-                            ref={(el) => { if (cardRefs.current) cardRefs.current[i] = el; }}
                             className="space-y-8 opacity-0 animate-[fade-in-up_1s_ease-out_forwards]"
                             style={{ animationDelay: `${i * 150}ms` }}
                         >
-                            {/* Mobile Visual - each card has its own local reveal state via visibleSteps */}
+                            {/* Mobile Visual - each card has its own local reveal state */}
                             <div className="px-2">
                                 <HowToUseVisual
-                                    activeIndex={visibleSteps.includes(i) ? i : -1}
+                                    activeIndex={i}
                                     currentStep={i}
+                                    sectionInView={sectionInView}
                                     totalSteps={STEPS.length}
                                     isMobile={true}
                                 />
