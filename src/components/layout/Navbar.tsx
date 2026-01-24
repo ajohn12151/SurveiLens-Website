@@ -27,7 +27,7 @@ export const Navbar = () => {
                                 alt="Surveilens"
                                 width={480}
                                 height={120}
-                                className="h-32 w-auto object-contain drop-shadow-md scale-125"
+                                className="h-32 sm:h-36 w-auto object-contain drop-shadow-md scale-125 sm:scale-135"
                                 priority
                             />
                         </Link>
