@@ -51,125 +51,152 @@ const STEPS: Step[] = [
     },
 ];
 
-const HowToUseVisual = ({ activeIndex, totalSteps }: { activeIndex: number, totalSteps: number }) => {
+const HowToUseVisual = ({ activeIndex, totalSteps, isMobile = false }: { activeIndex: number, totalSteps: number, isMobile?: boolean }) => {
     return (
-        <div className="relative aspect-video w-full rounded-2xl border border-white/10 bg-black/90 overflow-hidden shadow-2xl">
-            {/* Animated Grid Background */}
-            <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-4 grid-rows-4 sm:grid-rows-3 gap-0.5 p-2">
-                {Array.from({ length: 8 }).map((_, i) => (
+        <div className={cn(
+            "relative w-full rounded-2xl border border-white/10 bg-black/90 overflow-hidden shadow-2xl",
+            isMobile ? "aspect-[4/3] sm:aspect-video" : "aspect-video"
+        )}>
+            {/* Animated Grid Background - Subtler on mobile */}
+            <div className={cn(
+                "absolute inset-0 grid gap-0.5 p-2 transition-opacity duration-1000",
+                isMobile ? "grid-cols-2 grid-rows-2 opacity-10" : "grid-cols-4 grid-rows-3 opacity-20"
+            )}>
+                {Array.from({ length: isMobile ? 4 : 12 }).map((_, i) => (
                     <div
                         key={i}
-                        className={cn(
-                            "rounded-sm flex items-center justify-center text-[8px] font-mono transition-all duration-500",
-                            i === 5 || i === 6 ? "bg-surveilens-blue/20 text-surveilens-blue/60" : "bg-zinc-800/50 text-zinc-600/50",
-                            i >= 6 && "hidden sm:flex"
-                        )}
-                        style={{ animationDelay: `${i * 50}ms` }}
+                        className="bg-zinc-800/50 rounded-sm flex items-center justify-center text-[7px] text-zinc-600 font-mono"
                     >
                         CAM-{String(i + 1).padStart(2, "0")}
                     </div>
                 ))}
             </div>
 
-            {/* Scan Line Effect */}
-            <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute inset-y-0 left-0 w-px bg-surveilens-blue/30 shadow-[0_0_15px_rgba(43,106,255,0.5)] z-10 animate-[scan_4s_linear_infinite]" />
+            {/* Scan Line Effect - Global definition */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+                <div className="absolute inset-y-0 left-0 w-px bg-surveilens-blue/40 shadow-[0_0_15px_rgba(43,106,255,0.6)] animate-[scan_4s_linear_infinite]" />
             </div>
 
-            {/* Step 1: Overlay Layer */}
+            {/* Step 1: System Boot-up / Overlay Layer */}
             <div className={cn(
-                "absolute inset-2 border-2 rounded-xl transition-all duration-700",
-                activeIndex >= 0
-                    ? "border-surveilens-blue/40 opacity-100 shadow-[inset_0_0_30px_rgba(43,106,255,0.1)]"
-                    : "border-transparent opacity-0"
+                "absolute inset-0 transition-all duration-700 flex items-center justify-center",
+                activeIndex >= 0 ? "opacity-100" : "opacity-0"
             )}>
                 <div className={cn(
-                    "absolute top-2 left-2 px-3 py-1 rounded-full text-[10px] font-mono transition-all duration-500",
-                    activeIndex >= 0 ? "bg-surveilens-blue/20 text-surveilens-blue" : "opacity-0"
+                    "absolute inset-4 border border-surveilens-blue/30 rounded-xl transition-all duration-1000",
+                    activeIndex === 0 && "animate-[glitch_2s_infinite]"
                 )}>
-                    ● SURVEILENS ACTIVE
+                    {/* Corners */}
+                    <div className="absolute top-0 left-0 w-4 h-4 border-l-2 border-t-2 border-surveilens-blue/60 rounded-tl-lg" />
+                    <div className="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-surveilens-blue/60 rounded-br-lg" />
+                </div>
+
+                <div className={cn(
+                    "px-4 py-2 bg-surveilens-blue/10 border border-surveilens-blue/30 rounded-lg backdrop-blur-md transition-all duration-500",
+                    activeIndex === 0 ? "scale-100 shadow-[0_0_30px_rgba(43,106,255,0.2)]" : "scale-90"
+                )}>
+                    <span className="text-[10px] sm:text-xs font-mono text-surveilens-blue font-bold tracking-tighter">
+                        SYSTEM STATUS: ACTIVE
+                    </span>
+                    <div className="h-0.5 w-full bg-surveilens-blue/20 mt-1 overflow-hidden">
+                        <div className="h-full bg-surveilens-blue animate-[scan_2s_linear_infinite]" style={{ width: '30%' }} />
+                    </div>
                 </div>
             </div>
 
-            {/* Step 2: Zone Boxes */}
+            {/* Step 2: SVG Path Drawing for Zones */}
             <div className={cn(
-                "absolute inset-0 transition-all duration-700",
+                "absolute inset-0 transition-all duration-700 pointer-events-none",
                 activeIndex >= 1 ? "opacity-100" : "opacity-0"
             )}>
-                <div className={cn(
-                    "absolute top-1/4 left-1/4 w-24 h-20 border-2 border-dashed rounded-lg transition-all duration-500",
-                    activeIndex >= 1 ? "border-white/40 animate-pulse" : "border-transparent"
-                )} />
-                <div className={cn(
-                    "absolute bottom-1/4 right-1/4 w-20 h-16 border-2 border-dashed rounded-lg transition-all duration-500",
-                    activeIndex >= 1 ? "border-white/30" : "border-transparent"
-                )} style={{ animationDelay: "0.5s" }} />
-                <div className={cn(
-                    "absolute top-1/4 left-1/4 -translate-y-6 px-2 py-0.5 rounded text-[9px] font-bold transition-all duration-500",
-                    activeIndex >= 1 ? "bg-white/10 text-white/80 border border-white/20" : "opacity-0"
-                )}>
-                    ZONE A
-                </div>
+                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 225">
+                    {/* Zone A path drawing */}
+                    <path
+                        d="M 100 60 L 250 60 L 250 140 L 100 140 Z"
+                        fill="rgba(43,106,255,0.05)"
+                        stroke="rgba(43,106,255,0.5)"
+                        strokeWidth="2"
+                        strokeDasharray="1000"
+                        className={cn(
+                            "transition-all duration-[2000ms] ease-in-out",
+                            activeIndex >= 1 ? "animate-[draw-path_3s_forwards]" : "stroke-dashoffset-1000"
+                        )}
+                    />
+                    {/* Text tag positioned at the path start */}
+                    <foreignObject x="105" y="65" width="60" height="20">
+                        <div className="text-[8px] font-bold text-white bg-surveilens-blue/40 px-1.5 py-0.5 rounded border border-white/20">
+                            ZONE A
+                        </div>
+                    </foreignObject>
+                </svg>
             </div>
 
-            {/* Step 3: Toggle Panel */}
+            {/* Step 3: Toggles with Light Sweep */}
             <div className={cn(
-                "absolute top-2 sm:top-3 right-2 sm:right-3 bg-black/80 border rounded-lg sm:rounded-xl p-2 sm:p-3 space-y-1.5 sm:space-y-2 backdrop-blur-md transition-all duration-700",
-                activeIndex >= 2 ? "border-white/20 opacity-100 translate-x-0" : "border-transparent opacity-0 translate-x-4"
+                "absolute top-4 right-4 bg-black/60 border border-white/10 rounded-xl p-3 space-y-2 backdrop-blur-xl transition-all duration-700",
+                activeIndex === 2 ? "translate-x-0 opacity-100 shadow-[0_0_40px_rgba(43,106,255,0.1)]" : (activeIndex > 2 ? "opacity-40 translate-x-0" : "translate-x-8 opacity-0")
             )}>
-                {["After-hours", "Access", "Violence", "Crowd"].map((label, idx) => (
-                    <div key={label} className="flex items-center justify-between gap-2 sm:gap-4">
-                        <span className="text-[7px] sm:text-[9px] text-zinc-400">{label}</span>
+                {["Intrusion", "Violence", "Loitering"].map((label, idx) => (
+                    <div key={label} className="flex items-center justify-between gap-6">
+                        <span className="text-[9px] text-zinc-400 font-medium uppercase tracking-wider">{label}</span>
                         <div className={cn(
-                            "w-5 h-2.5 sm:w-7 sm:h-3.5 rounded-full relative transition-all duration-300",
-                            activeIndex >= 2 ? "bg-surveilens-blue" : "bg-zinc-700"
-                        )} style={{ transitionDelay: `${idx * 100}ms` }}>
+                            "w-8 h-4 rounded-full relative transition-all duration-500",
+                            activeIndex >= 2 ? "bg-surveilens-blue" : "bg-zinc-800"
+                        )} style={{ transitionDelay: `${idx * 150}ms` }}>
                             <div className={cn(
-                                "absolute top-0.5 w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-white shadow-sm transition-all duration-300",
-                                activeIndex >= 2 ? "left-3 sm:left-3.5" : "left-0.5"
+                                "absolute top-0.5 w-3 h-3 rounded-full bg-white transition-all duration-500 shadow-md",
+                                activeIndex >= 2 ? "left-4.5" : "left-0.5"
                             )} />
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* Step 4: Alert Card */}
+            {/* Step 4: Radar Ping Alert Entrance */}
             <div className={cn(
-                "absolute bottom-10 sm:bottom-14 left-2 sm:left-3 right-2 sm:right-3 p-2 sm:p-4 rounded-lg sm:rounded-xl bg-black/90 border flex items-center gap-3 sm:gap-4 backdrop-blur-md transition-all duration-700",
+                "absolute bottom-6 sm:bottom-10 left-4 sm:left-6 right-4 sm:right-6 p-3 sm:p-5 rounded-xl bg-black/80 border transition-all duration-700 flex items-center gap-4 backdrop-blur-2xl overflow-hidden",
                 activeIndex >= 3
-                    ? "border-surveilens-blue/40 opacity-100 translate-y-0 shadow-[0_0_30px_rgba(43,106,255,0.15)]"
-                    : "border-transparent opacity-0 translate-y-3"
+                    ? "border-surveilens-blue/50 opacity-100 translate-y-0 shadow-[0_20px_40px_-15px_rgba(43,106,255,0.3)]"
+                    : "border-transparent opacity-0 translate-y-8"
             )}>
+                {/* Radar Bloom Background */}
+                {activeIndex === 3 && (
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 bg-surveilens-blue/20 rounded-full animate-[bloom_1.5s_infinite]" />
+                )}
+
                 <div className="relative shrink-0">
-                    <div className="h-8 w-8 sm:h-10 sm:w-10 bg-surveilens-blue/20 rounded-lg sm:rounded-xl flex items-center justify-center">
-                        <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-surveilens-blue" />
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 bg-surveilens-blue/20 rounded-xl flex items-center justify-center border border-surveilens-blue/30">
+                        <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-surveilens-blue" />
                     </div>
-                    <div className="absolute -top-1 -right-1 w-2 sm:w-3 h-2 sm:h-3 bg-surveilens-blue rounded-full animate-ping" />
+                    {/* Live blip */}
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-surveilens-blue rounded-full border-2 border-black" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <div className="text-white text-xs sm:text-sm font-semibold truncate">After-hours Presence</div>
-                    <div className="text-zinc-500 text-[9px] sm:text-[11px] truncate">CAM-06 • Hallway A • 94%</div>
+                    <div className="text-white text-sm sm:text-base font-bold tracking-tight truncate">HIGH THREAT SIGNAL</div>
+                    <div className="text-zinc-500 text-[9px] sm:text-xs font-mono uppercase truncate tracking-widest mt-0.5">Hallway C • Cam-09 • 10:24 PM</div>
                 </div>
-                <span className="text-[8px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 bg-surveilens-blue/20 rounded-full text-surveilens-blue font-mono animate-pulse shrink-0">● LIVE</span>
+                <div className="hidden sm:flex flex-col items-end shrink-0">
+                    <span className="text-[10px] px-2 py-0.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full font-bold animate-pulse">CRITICAL</span>
+                </div>
             </div>
 
-            {/* Step 5: Action Buttons */}
+            {/* Step 5: High-Impact Action Buttons */}
             <div className={cn(
-                "absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 flex gap-1.5 sm:gap-2 transition-all duration-700",
-                activeIndex >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+                "absolute bottom-3 left-3 right-3 flex gap-2 transition-all duration-700",
+                activeIndex >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             )}>
-                <button className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs bg-zinc-800 text-zinc-300 rounded-md sm:rounded-lg border border-white/10 hover:bg-zinc-700 transition-colors font-medium">
-                    Dismiss
+                <button className="flex-1 py-3 text-[10px] font-bold uppercase tracking-widest bg-zinc-900 text-zinc-400 rounded-lg border border-white/5 hover:bg-zinc-800 transition-all">
+                    ACKNOWLEDGE
                 </button>
-                <button className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs bg-surveilens-blue text-white rounded-md sm:rounded-lg hover:bg-blue-600 transition-all shadow-lg shadow-surveilens-blue/30 font-medium">
-                    Escalate →
+                <button className="flex-2 py-3 text-[10px] font-bold uppercase tracking-widest bg-surveilens-blue text-white rounded-lg shadow-lg shadow-surveilens-blue/30 hover:bg-blue-600 transition-all border border-white/10">
+                    ESCAlATE TO SECURITY →
                 </button>
             </div>
 
-            {/* Progress Bar */}
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-zinc-800/50">
+            {/* Progress Bar - Thicker & Glowing */}
+            <div className="absolute bottom-0 left-0 right-0 h-1 sm:h-1.5 bg-zinc-900">
                 <div
-                    className="h-full bg-gradient-to-r from-surveilens-blue to-blue-400 transition-all duration-500 shadow-[0_0_10px_rgba(43,106,255,0.5)]"
+                    className="h-full bg-gradient-to-r from-surveilens-blue to-blue-400 transition-all duration-700 shadow-[0_0_20px_rgba(43,106,255,0.8)]"
                     style={{ width: `${((activeIndex + 1) / totalSteps) * 100}%` }}
                 />
             </div>
@@ -285,17 +312,19 @@ export const HowToUseScroll = () => {
                             className="space-y-6 opacity-0 animate-[fade-in-up_0.7s_ease-out_forwards]"
                             style={{ animationDelay: `${i * 150}ms` }}
                         >
-                            {/* Mobile Visual - always showing state up to this step */}
-                            <HowToUseVisual activeIndex={i} totalSteps={STEPS.length} />
+                            {/* Mobile Visual - focused view for this specific step */}
+                            <HowToUseVisual activeIndex={i} totalSteps={STEPS.length} isMobile={true} />
 
-                            <div className="p-6 rounded-2xl bg-black/60 border border-white/10 mx-2 shadow-xl">
+                            <div className="p-6 rounded-2xl bg-black/60 border border-white/10 mx-2 shadow-xl backdrop-blur-md">
                                 <div className="flex items-center gap-4 mb-4">
                                     <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surveilens-blue text-white font-bold shadow-lg shadow-surveilens-blue/20">
                                         {step.number}
                                     </span>
-                                    <step.icon className="h-6 w-6 text-surveilens-blue" />
+                                    <div className="p-2 bg-white/5 rounded-lg border border-white/5">
+                                        <step.icon className="h-5 w-5 text-surveilens-blue" />
+                                    </div>
                                 </div>
-                                <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
+                                <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
                                 <p className="text-zinc-400 text-sm leading-relaxed">{step.description}</p>
                             </div>
                         </div>
