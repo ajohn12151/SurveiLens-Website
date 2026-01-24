@@ -23,11 +23,11 @@ export const Navbar = () => {
                     <div className="flex-shrink-0">
                         <Link href="/" className="flex items-center gap-2">
                             <Image
-                                src="/logo.png"
+                                src="/Surveilens Logo.png"
                                 alt="Surveilens"
-                                width={240}
-                                height={60}
-                                className="h-14 w-auto object-contain drop-shadow-md"
+                                width={480}
+                                height={120}
+                                className="h-40 w-auto object-contain drop-shadow-md scale-150"
                                 priority
                             />
                         </Link>

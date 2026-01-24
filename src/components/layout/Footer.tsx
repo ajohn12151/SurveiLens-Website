@@ -11,11 +11,11 @@ export const Footer = () => {
                     <div className="flex flex-col items-center md:items-start gap-2">
                         <Link href="/" className="flex items-center">
                             <Image
-                                src="/logo.png"
+                                src="/Surveilens Logo.png"
                                 alt="Surveilens"
-                                width={140}
-                                height={35}
-                                className="h-7 w-auto object-contain mb-2"
+                                width={280}
+                                height={70}
+                                className="h-20 w-auto object-contain mb-2 scale-125"
                             />
                         </Link>
                         <p className="text-sm text-zinc-500">

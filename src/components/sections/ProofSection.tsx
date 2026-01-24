@@ -27,56 +27,60 @@ export const ProofSection = () => {
                     {/* Camera Mosaic (Existing System) */}
                     <div className="relative aspect-video rounded-2xl border border-white/10 bg-black/80 overflow-hidden shadow-2xl">
                         {/* Grid of Camera Feeds */}
-                        <div className="absolute inset-0 grid grid-cols-4 grid-rows-3 gap-1 p-2">
-                            {Array.from({ length: 12 }).map((_, i) => (
+                        <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-4 grid-rows-4 sm:grid-rows-3 gap-1 p-2">
+                            {Array.from({ length: 8 }).map((_, i) => (
                                 <div
                                     key={i}
                                     className={cn(
                                         "relative rounded-sm overflow-hidden flex items-center justify-center",
-                                        "bg-zinc-900/80 border border-white/5"
+                                        "bg-zinc-900/80 border border-white/5",
+                                        i >= 6 && "hidden sm:flex" // Show fewer cameras on very small mobile if needed, but 8 fits 2x4
                                     )}
                                 >
                                     {/* Fake camera view */}
                                     <div className="absolute inset-0 bg-gradient-to-br from-zinc-800/50 to-zinc-900/50" />
-                                    <span className="relative text-[9px] text-zinc-600 font-mono">
+                                    <span className="relative text-[8px] sm:text-[9px] text-zinc-600 font-mono">
                                         CAM-{String(i + 1).padStart(2, "0")}
                                     </span>
                                     {/* Status indicator */}
-                                    <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-green-500/60" />
+                                    <div className="absolute top-1 right-1 w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-green-500/60" />
                                 </div>
                             ))}
                         </div>
 
                         {/* "Existing System" Label */}
-                        <div className="absolute bottom-3 left-3 px-2 py-1 bg-zinc-800/80 rounded text-[10px] text-zinc-400 font-mono border border-white/10">
-                            EXISTING VMS SYSTEM
+                        <div className="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 px-1.5 sm:px-2 py-0.5 sm:py-1 bg-zinc-800/80 rounded text-[8px] sm:text-[10px] text-zinc-400 font-mono border border-white/10">
+                            EXISTING VMS
                         </div>
+
+                        {/* Scanning Line Animation */}
+                        <div className="absolute inset-y-0 left-0 w-px bg-surveilens-blue/30 shadow-[0_0_15px_rgba(43,106,255,0.5)] z-10 animate-[scan_4s_linear_infinite]" />
                     </div>
 
                     {/* Surveilens Overlay Layer */}
-                    <div className="absolute -inset-2 rounded-3xl border-2 border-surveilens-blue/40 pointer-events-none animate-pulse" style={{ animationDuration: "3s" }}>
+                    <div className="absolute -inset-1 sm:-inset-2 rounded-2xl sm:rounded-3xl border sm:border-2 border-surveilens-blue/40 pointer-events-none animate-slow-pulse">
                         {/* Overlay Label */}
-                        <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-surveilens-blue text-white text-sm font-semibold rounded-full shadow-lg shadow-surveilens-blue/30">
+                        <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-1 sm:py-1.5 bg-surveilens-blue text-white text-[10px] sm:text-sm font-semibold rounded-full shadow-lg shadow-surveilens-blue/30 whitespace-nowrap">
                             + SURVEILENS OVERLAY
                         </div>
 
                         {/* Corner Accents */}
-                        <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-surveilens-blue rounded-tl-xl" />
-                        <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-surveilens-blue rounded-tr-xl" />
-                        <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-surveilens-blue rounded-bl-xl" />
-                        <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-surveilens-blue rounded-br-xl" />
+                        <div className="absolute top-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-l border-t sm:border-l-2 sm:border-t-2 border-surveilens-blue rounded-tl-lg sm:rounded-tl-xl" />
+                        <div className="absolute top-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-r border-t sm:border-r-2 sm:border-t-2 border-surveilens-blue rounded-tr-lg sm:rounded-tr-xl" />
+                        <div className="absolute bottom-0 left-0 w-6 h-6 sm:w-8 sm:h-8 border-l border-b sm:border-l-2 sm:border-b-2 border-surveilens-blue rounded-bl-lg sm:rounded-bl-xl" />
+                        <div className="absolute bottom-0 right-0 w-6 h-6 sm:w-8 sm:h-8 border-r border-b sm:border-r-2 sm:border-b-2 border-surveilens-blue rounded-br-lg sm:rounded-br-xl" />
 
                         {/* Detection Zone Highlight */}
-                        <div className="absolute top-1/4 left-1/4 w-1/3 h-1/3 border-2 border-dashed border-surveilens-blue/50 rounded-lg">
-                            <div className="absolute -top-3 left-2 px-1.5 py-0.5 bg-surveilens-blue/20 text-surveilens-blue text-[8px] font-bold rounded">
+                        <div className="absolute top-1/4 left-1/4 w-1/3 h-1/3 border sm:border-2 border-dashed border-surveilens-blue/50 rounded-lg">
+                            <div className="absolute -top-3 left-2 px-1 py-0.5 bg-surveilens-blue/20 text-surveilens-blue text-[7px] sm:text-[8px] font-bold rounded">
                                 ZONE A
                             </div>
                         </div>
 
                         {/* Alert Indicator */}
-                        <div className="absolute bottom-8 right-8 flex items-center gap-2 px-3 py-2 bg-black/90 rounded-lg border border-surveilens-blue/30 shadow-xl">
-                            <div className="w-2 h-2 rounded-full bg-surveilens-blue animate-ping" />
-                            <span className="text-xs text-white font-medium">Signal Active</span>
+                        <div className="absolute bottom-4 sm:bottom-8 right-4 sm:right-8 flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 bg-black/90 rounded-lg border border-surveilens-blue/30 shadow-xl">
+                            <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-surveilens-blue animate-ping" />
+                            <span className="text-[10px] sm:text-xs text-white font-medium whitespace-nowrap">Signal Active</span>
                         </div>
                     </div>
                 </div>
