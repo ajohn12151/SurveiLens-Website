@@ -51,7 +51,7 @@ const STEPS: Step[] = [
     },
 ];
 
-const HowToUseVisual = ({ activeIndex, currentStep, sectionInView, isMobile = false }: { activeIndex: number, currentStep: number, sectionInView: boolean, isMobile?: boolean }) => {
+const HowToUseVisual = ({ activeIndex, currentStep, totalSteps, sectionInView, isMobile = false }: { activeIndex: number, currentStep: number, totalSteps: number, sectionInView: boolean, isMobile?: boolean }) => {
     // Cinematic Step 1 logic: Show black for 1000ms, then reveal grid
     const [isRevealed, setIsRevealed] = useState(false);
 
