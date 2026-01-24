@@ -15,7 +15,7 @@ export const Footer = () => {
                                 alt="Surveilens"
                                 width={280}
                                 height={70}
-                                className="h-20 w-auto object-contain mb-2 scale-125"
+                                className="h-28 w-auto object-contain mb-2 scale-150"
                             />
                         </Link>
                         <p className="text-sm text-zinc-500">

@@ -280,19 +280,23 @@ export const HowToUseScroll = () => {
                 {/* Mobile: Simple Stack */}
                 <div className="lg:hidden space-y-12">
                     {STEPS.map((step, i) => (
-                        <div key={step.id} className="space-y-6">
+                        <div
+                            key={step.id}
+                            className="space-y-6 opacity-0 animate-[fade-in-up_0.7s_ease-out_forwards]"
+                            style={{ animationDelay: `${i * 150}ms` }}
+                        >
                             {/* Mobile Visual - always showing state up to this step */}
                             <HowToUseVisual activeIndex={i} totalSteps={STEPS.length} />
 
-                            <div className="p-6 rounded-2xl bg-black/60 border border-white/10 mx-2">
+                            <div className="p-6 rounded-2xl bg-black/60 border border-white/10 mx-2 shadow-xl">
                                 <div className="flex items-center gap-4 mb-4">
-                                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surveilens-blue text-white font-bold">
+                                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surveilens-blue text-white font-bold shadow-lg shadow-surveilens-blue/20">
                                         {step.number}
                                     </span>
                                     <step.icon className="h-6 w-6 text-surveilens-blue" />
                                 </div>
                                 <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                                <p className="text-zinc-400">{step.description}</p>
+                                <p className="text-zinc-400 text-sm leading-relaxed">{step.description}</p>
                             </div>
                         </div>
                     ))}
