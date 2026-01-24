@@ -55,13 +55,14 @@ const HowToUseVisual = ({ activeIndex, totalSteps }: { activeIndex: number, tota
     return (
         <div className="relative aspect-video w-full rounded-2xl border border-white/10 bg-black/90 overflow-hidden shadow-2xl">
             {/* Animated Grid Background */}
-            <div className="absolute inset-0 grid grid-cols-4 grid-rows-3 gap-0.5 p-2">
-                {Array.from({ length: 12 }).map((_, i) => (
+            <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-4 grid-rows-4 sm:grid-rows-3 gap-0.5 p-2">
+                {Array.from({ length: 8 }).map((_, i) => (
                     <div
                         key={i}
                         className={cn(
                             "rounded-sm flex items-center justify-center text-[8px] font-mono transition-all duration-500",
-                            i === 5 || i === 6 ? "bg-surveilens-blue/20 text-surveilens-blue/60" : "bg-zinc-800/50 text-zinc-600/50"
+                            i === 5 || i === 6 ? "bg-surveilens-blue/20 text-surveilens-blue/60" : "bg-zinc-800/50 text-zinc-600/50",
+                            i >= 6 && "hidden sm:flex"
                         )}
                         style={{ animationDelay: `${i * 50}ms` }}
                     >
@@ -72,8 +73,7 @@ const HowToUseVisual = ({ activeIndex, totalSteps }: { activeIndex: number, tota
 
             {/* Scan Line Effect */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-surveilens-blue/50 to-transparent animate-scan"
-                    style={{ animation: "scan 3s linear infinite" }} />
+                <div className="absolute inset-y-0 left-0 w-px bg-surveilens-blue/30 shadow-[0_0_15px_rgba(43,106,255,0.5)] z-10 animate-[scan_4s_linear_infinite]" />
             </div>
 
             {/* Step 1: Overlay Layer */}
@@ -114,19 +114,19 @@ const HowToUseVisual = ({ activeIndex, totalSteps }: { activeIndex: number, tota
 
             {/* Step 3: Toggle Panel */}
             <div className={cn(
-                "absolute top-3 right-3 bg-black/80 border rounded-xl p-3 space-y-2 backdrop-blur-md transition-all duration-700",
+                "absolute top-2 sm:top-3 right-2 sm:right-3 bg-black/80 border rounded-lg sm:rounded-xl p-2 sm:p-3 space-y-1.5 sm:space-y-2 backdrop-blur-md transition-all duration-700",
                 activeIndex >= 2 ? "border-white/20 opacity-100 translate-x-0" : "border-transparent opacity-0 translate-x-4"
             )}>
                 {["After-hours", "Access", "Violence", "Crowd"].map((label, idx) => (
-                    <div key={label} className="flex items-center justify-between gap-4">
-                        <span className="text-[9px] text-zinc-400">{label}</span>
+                    <div key={label} className="flex items-center justify-between gap-2 sm:gap-4">
+                        <span className="text-[7px] sm:text-[9px] text-zinc-400">{label}</span>
                         <div className={cn(
-                            "w-7 h-3.5 rounded-full relative transition-all duration-300",
+                            "w-5 h-2.5 sm:w-7 sm:h-3.5 rounded-full relative transition-all duration-300",
                             activeIndex >= 2 ? "bg-surveilens-blue" : "bg-zinc-700"
                         )} style={{ transitionDelay: `${idx * 100}ms` }}>
                             <div className={cn(
-                                "absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white shadow-sm transition-all duration-300",
-                                activeIndex >= 2 ? "left-3.5" : "left-0.5"
+                                "absolute top-0.5 w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 rounded-full bg-white shadow-sm transition-all duration-300",
+                                activeIndex >= 2 ? "left-3 sm:left-3.5" : "left-0.5"
                             )} />
                         </div>
                     </div>
@@ -135,33 +135,33 @@ const HowToUseVisual = ({ activeIndex, totalSteps }: { activeIndex: number, tota
 
             {/* Step 4: Alert Card */}
             <div className={cn(
-                "absolute bottom-14 left-3 right-3 p-4 rounded-xl bg-black/90 border flex items-center gap-4 backdrop-blur-md transition-all duration-700",
+                "absolute bottom-10 sm:bottom-14 left-2 sm:left-3 right-2 sm:right-3 p-2 sm:p-4 rounded-lg sm:rounded-xl bg-black/90 border flex items-center gap-3 sm:gap-4 backdrop-blur-md transition-all duration-700",
                 activeIndex >= 3
                     ? "border-surveilens-blue/40 opacity-100 translate-y-0 shadow-[0_0_30px_rgba(43,106,255,0.15)]"
                     : "border-transparent opacity-0 translate-y-3"
             )}>
-                <div className="relative">
-                    <div className="h-10 w-10 bg-surveilens-blue/20 rounded-xl flex items-center justify-center">
-                        <Bell className="h-5 w-5 text-surveilens-blue" />
+                <div className="relative shrink-0">
+                    <div className="h-8 w-8 sm:h-10 sm:w-10 bg-surveilens-blue/20 rounded-lg sm:rounded-xl flex items-center justify-center">
+                        <Bell className="h-4 w-4 sm:h-5 sm:w-5 text-surveilens-blue" />
                     </div>
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-surveilens-blue rounded-full animate-ping" />
+                    <div className="absolute -top-1 -right-1 w-2 sm:w-3 h-2 sm:h-3 bg-surveilens-blue rounded-full animate-ping" />
                 </div>
                 <div className="flex-1 min-w-0">
-                    <div className="text-white text-sm font-semibold">After-hours Presence</div>
-                    <div className="text-zinc-500 text-[11px]">CAM-06 • Hallway A • 94% confidence</div>
+                    <div className="text-white text-xs sm:text-sm font-semibold truncate">After-hours Presence</div>
+                    <div className="text-zinc-500 text-[9px] sm:text-[11px] truncate">CAM-06 • Hallway A • 94%</div>
                 </div>
-                <span className="text-[10px] px-2 py-1 bg-surveilens-blue/20 rounded-full text-surveilens-blue font-mono animate-pulse">● LIVE</span>
+                <span className="text-[8px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 sm:py-1 bg-surveilens-blue/20 rounded-full text-surveilens-blue font-mono animate-pulse shrink-0">● LIVE</span>
             </div>
 
             {/* Step 5: Action Buttons */}
             <div className={cn(
-                "absolute bottom-3 left-3 right-3 flex gap-2 transition-all duration-700",
+                "absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 flex gap-1.5 sm:gap-2 transition-all duration-700",
                 activeIndex >= 4 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
             )}>
-                <button className="flex-1 px-4 py-2 text-xs bg-zinc-800 text-zinc-300 rounded-lg border border-white/10 hover:bg-zinc-700 transition-colors font-medium">
+                <button className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs bg-zinc-800 text-zinc-300 rounded-md sm:rounded-lg border border-white/10 hover:bg-zinc-700 transition-colors font-medium">
                     Dismiss
                 </button>
-                <button className="flex-1 px-4 py-2 text-xs bg-surveilens-blue text-white rounded-lg hover:bg-blue-600 transition-all shadow-lg shadow-surveilens-blue/30 font-medium">
+                <button className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-xs bg-surveilens-blue text-white rounded-md sm:rounded-lg hover:bg-blue-600 transition-all shadow-lg shadow-surveilens-blue/30 font-medium">
                     Escalate →
                 </button>
             </div>

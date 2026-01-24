@@ -30,21 +30,21 @@ export const Hero = () => {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[700px] sm:h-[700px] bg-surveilens-blue/20 blur-[80px] sm:blur-[180px] rounded-full pointer-events-none" />
 
             {/* Mobile Digital Scope (Visible Tech Layer) */}
-            <div className="block sm:hidden absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] pointer-events-none opacity-50">
+            <div className="block sm:hidden absolute top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] pointer-events-none opacity-40">
                 {/* Rotating Dashed Ring - The Core Scope */}
                 <div className="absolute inset-0 rounded-full border-2 border-dashed border-surveilens-blue/40 animate-[spin_30s_linear_infinite]">
                     {/* Orbiting blip */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-surveilens-blue rounded-full shadow-[0_0_10px_rgba(43,106,255,0.8)]" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-surveilens-blue rounded-full shadow-[0_0_8px_rgba(43,106,255,0.8)]" />
                 </div>
 
                 {/* Static Inner Hairline Ring */}
-                <div className="absolute inset-8 rounded-full border border-surveilens-blue/20" />
+                <div className="absolute inset-6 rounded-full border border-surveilens-blue/20" />
 
                 {/* Static Crosshairs */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 w-[1px] h-8 bg-surveilens-blue/50" />
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 w-[1px] h-8 bg-surveilens-blue/50" />
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 h-[1px] w-8 bg-surveilens-blue/50" />
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 h-[1px] w-8 bg-surveilens-blue/50" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 w-[1px] h-6 bg-surveilens-blue/40" />
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-2 w-[1px] h-6 bg-surveilens-blue/40" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 h-[1px] w-6 bg-surveilens-blue/40" />
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 h-[1px] w-6 bg-surveilens-blue/40" />
             </div>
 
             <div className="relative z-10 px-4 max-w-5xl mx-auto flex flex-col items-center gap-8">
@@ -52,7 +52,7 @@ export const Hero = () => {
 
 
                 {/* Product-First Headline */}
-                <h1 className="text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl leading-[1.1]">
+                <h1 className="text-4xl xs:text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl leading-[1.1]">
                     Targeted threat detection.
                     <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-surveilens-blue via-blue-400 to-surveilens-blue animate-gradient-x">

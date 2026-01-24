@@ -15,8 +15,9 @@ export const SignalBackground = () => {
         let width = (canvas.width = window.innerWidth);
         let height = (canvas.height = window.innerHeight);
 
+        const isMobile = width < 768;
         const dots: { x: number; y: number; size: number; alpha: number }[] = [];
-        const DOT_COUNT = 80;
+        const DOT_COUNT = isMobile ? 40 : 80;
 
         for (let i = 0; i < DOT_COUNT; i++) {
             dots.push({

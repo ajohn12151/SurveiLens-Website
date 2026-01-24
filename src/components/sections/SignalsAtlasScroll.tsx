@@ -61,9 +61,15 @@ const SignalDemonstration = ({ activeIndex }: { activeIndex: number }) => {
     return (
         <div className="relative aspect-video w-full rounded-2xl border border-white/10 bg-black/90 overflow-hidden shadow-2xl">
             {/* Camera Grid Background */}
-            <div className="absolute inset-0 grid grid-cols-4 grid-rows-3 gap-0.5 p-2 opacity-20">
-                {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className="bg-zinc-800 rounded-sm flex items-center justify-center text-[8px] text-zinc-600 font-mono">
+            <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-4 grid-rows-4 sm:grid-rows-3 gap-0.5 p-2 opacity-20">
+                {Array.from({ length: 8 }).map((_, i) => (
+                    <div
+                        key={i}
+                        className={cn(
+                            "bg-zinc-800 rounded-sm flex items-center justify-center text-[8px] text-zinc-600 font-mono",
+                            i >= 6 && "hidden sm:flex"
+                        )}
+                    >
                         CAM-{String(i + 1).padStart(2, "0")}
                     </div>
                 ))}
@@ -81,8 +87,8 @@ const SignalDemonstration = ({ activeIndex }: { activeIndex: number }) => {
             </div>
 
             {/* Center Visualization Zone */}
-            <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-44 h-44 rounded-xl border border-white/20 bg-white/5">
+            <div className="absolute inset-0 flex items-center justify-center scale-90 sm:scale-100">
+                <div className="relative w-32 h-32 sm:w-44 sm:h-44 rounded-xl border border-white/20 bg-white/5">
 
                     {/* Violence: Motion Lines */}
                     <div className={cn(
@@ -143,15 +149,15 @@ const SignalDemonstration = ({ activeIndex }: { activeIndex: number }) => {
             </div>
 
             {/* Bottom Alert */}
-            <div className="absolute bottom-4 left-4 right-4 p-3 rounded-lg border border-white/10 bg-black/60 backdrop-blur-sm flex items-center gap-3">
-                <div className="h-8 w-8 rounded-lg bg-white/10 flex items-center justify-center">
-                    <chapter.icon className="h-4 w-4 text-white/70" />
+            <div className="absolute bottom-2 sm:bottom-4 left-2 sm:left-4 right-2 sm:right-4 p-2 sm:p-3 rounded-lg border border-white/10 bg-black/60 backdrop-blur-sm flex items-center gap-2 sm:gap-3">
+                <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                    <chapter.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-white/70" />
                 </div>
-                <div className="flex-1">
-                    <div className="text-white text-sm font-medium">{chapter.title} detected</div>
-                    <div className="text-zinc-500 text-[10px]">CAM-06 • Hallway A • 98% confidence</div>
+                <div className="flex-1 min-w-0">
+                    <div className="text-white text-xs sm:text-sm font-medium truncate">{chapter.title} detected</div>
+                    <div className="text-zinc-500 text-[8px] sm:text-[10px] truncate">CAM-06 • Hallway A • 98% confidence</div>
                 </div>
-                <span className="text-[10px] px-1.5 py-0.5 bg-surveilens-blue/20 rounded text-surveilens-blue font-mono">LIVE</span>
+                <span className="text-[8px] sm:text-[10px] px-1.5 py-0.5 bg-surveilens-blue/20 rounded text-surveilens-blue font-mono shrink-0">LIVE</span>
             </div>
         </div>
     );
