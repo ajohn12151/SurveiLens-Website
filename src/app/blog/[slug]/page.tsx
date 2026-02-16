@@ -9,6 +9,140 @@ import { ArrowLeft, Calendar, Clock, Share2, User } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
+// Simple Markdown parser for the blog content
+function parseMarkdown(content: string): React.ReactNode[] {
+    const lines = content.split('\n');
+    const elements: React.ReactNode[] = [];
+    let key = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Skip empty lines
+        if (!line.trim()) {
+            continue;
+        }
+
+        // Horizontal rule
+        if (line.trim() === '---') {
+            elements.push(<hr key={key++} className="my-8 border-white/20" />);
+            continue;
+        }
+
+        // H2 headers
+        if (line.startsWith('## ')) {
+            elements.push(
+                <h2 key={key++} className="text-2xl font-bold mt-12 mb-6 text-white">
+                    {parseInlineStyles(line.substring(3))}
+                </h2>
+            );
+            continue;
+        }
+
+        // H3 headers
+        if (line.startsWith('### ')) {
+            elements.push(
+                <h3 key={key++} className="text-xl font-bold mt-8 mb-4 text-white">
+                    {parseInlineStyles(line.substring(4))}
+                </h3>
+            );
+            continue;
+        }
+
+        // Numbered lists (simple detection)
+        if (/^\d+\.\s/.test(line)) {
+            const listItems: string[] = [];
+            let j = i;
+            while (j < lines.length && /^\d+\.\s/.test(lines[j])) {
+                listItems.push(lines[j].replace(/^\d+\.\s/, ''));
+                j++;
+            }
+            elements.push(
+                <ol key={key++} className="list-decimal list-inside space-y-2 mb-6 text-zinc-300">
+                    {listItems.map((item, idx) => (
+                        <li key={idx}>{parseInlineStyles(item)}</li>
+                    ))}
+                </ol>
+            );
+            i = j - 1;
+            continue;
+        }
+
+        // Bulleted lists
+        if (line.startsWith('- ')) {
+            const listItems: string[] = [];
+            let j = i;
+            while (j < lines.length && lines[j].startsWith('- ')) {
+                listItems.push(lines[j].substring(2));
+                j++;
+            }
+            elements.push(
+                <ul key={key++} className="list-disc list-inside space-y-2 mb-6 text-zinc-300">
+                    {listItems.map((item, idx) => (
+                        <li key={idx}>{parseInlineStyles(item)}</li>
+                    ))}
+                </ul>
+            );
+            i = j - 1;
+            continue;
+        }
+
+        // Regular paragraph
+        elements.push(
+            <p key={key++} className="mb-6 text-zinc-300 leading-relaxed">
+                {parseInlineStyles(line)}
+            </p>
+        );
+    }
+
+    return elements;
+}
+
+// Parse inline formatting (bold, italic)
+function parseInlineStyles(text: string): React.ReactNode {
+    const parts: React.ReactNode[] = [];
+    let current = '';
+    let i = 0;
+    let key = 0;
+
+    while (i < text.length) {
+        // Bold: **text**
+        if (text.substring(i, i + 2) === '**' && text.substring(i + 2).includes('**')) {
+            if (current) {
+                parts.push(<span key={key++}>{current}</span>);
+                current = '';
+            }
+            const endIdx = text.indexOf('**', i + 2);
+            const boldText = text.substring(i + 2, endIdx);
+            parts.push(<strong key={key++} className="text-white font-semibold">{boldText}</strong>);
+            i = endIdx + 2;
+            continue;
+        }
+
+        // Italic: *text* (but not ** which is bold)
+        if (text[i] === '*' && text.substring(i, i + 2) !== '**' && text.substring(i + 1).includes('*')) {
+            if (current) {
+                parts.push(<span key={key++}>{current}</span>);
+                current = '';
+            }
+            const endIdx = text.indexOf('*', i + 1);
+            const italicText = text.substring(i + 1, endIdx);
+            parts.push(<em key={key++} className="italic">{italicText}</em>);
+            i = endIdx + 1;
+            continue;
+        }
+
+        current += text[i];
+        i++;
+    }
+
+    if (current) {
+        parts.push(<span key={key++}>{current}</span>);
+    }
+
+    return parts.length === 1 ? parts[0] : <>{parts}</>;
+}
+
 export default function BlogPostPage() {
     const params = useParams();
     const slug = params?.slug as string;
@@ -85,29 +219,23 @@ export default function BlogPostPage() {
                         </div>
                     </header>
 
-                    {/* Content Placeholder */}
+                    {/* Content */}
                     <div className="prose prose-invert prose-lg max-w-none">
                         <p className="lead text-xl text-zinc-300 mb-8">
                             {post.excerpt}
                         </p>
 
-                        <div className="p-8 rounded-2xl bg-white/5 border border-white/10 text-center my-12">
-                            <p className="text-zinc-500 italic">
-                                [Full article content would be rendered here from Markdown]
-                            </p>
-                            <p className="text-zinc-600 text-sm mt-2">
-                                Editor note: This is a placeholder for the demo.
-                            </p>
-                        </div>
-
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                        </p>
-
-                        <h3>The Path Forward</h3>
-                        <p>
-                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                        </p>
+                        {post.content ? (
+                            <div className="article-content">
+                                {parseMarkdown(post.content)}
+                            </div>
+                        ) : (
+                            <div className="p-8 rounded-2xl bg-white/5 border border-white/10 text-center my-12">
+                                <p className="text-zinc-500 italic">
+                                    Full article coming soon.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                 </article>
